@@ -1,0 +1,332 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+\title{Enhancing Argumentation Structure Parsing with Deep Probabilistic Answer
+Set Programming}
+\author{Jonas Rodrigues Lima Gonçalves}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Argumentation Mining (AM) is a significant area within Natural Language 
+Processing (NLP) focused on extracting argumentative structures from text. Stab
+and Gurevych have contributed significantly to this field by proposing a 
+pipeline approach for parsing argumentation structures in persuasive essays.
+Their method involves segmenting the extraction process into several sub-steps,
+ including identifying argument components, classifying their types, and
+ identifying argumentative relations. A crucial final step in their pipeline
+ utilizes Integer Linear Programming (ILP) to enforce coherence between the
+ outputs of these sub-steps and generate a globally consistent argumentation
+ graph.
+
+While the ILP approach offers a way to integrate local predictions into a global
+ structure, it can face limitations in terms of capturing complex probabilistic
+ dependencies and being seamlessly integrated with end-to-end differentiable
+ learning. Recent advancements in neural-symbolic reasoning, particularly in
+ Deep Probabilistic Logic Programming frameworks like dPASP, offer promising
+ alternatives. dPASP extends Answer Set Programming (ASP) with neural
+ predicates, probabilistic choices, and tight integration with deep learning
+ frameworks like PyTorch, enabling end-to-end training through automatic
+ differentiation.
+
+This thesis project aims to \textbf{investigate the potential of replacing the
+integer programming-based coherence enforcement step in Stab and Gurevych's
+argumentation parsing pipeline with dPASP}. By leveraging dPASP's capabilities
+for probabilistic modeling and integration with neural networks, this project
+seeks to develop a more flexible and potentially more accurate approach to
+ensuring the coherence of extracted argumentation structures.
+
+\section{Objectives and Goals}
+
+The primary objective of this thesis project is to \textbf{design, implement,
+and evaluate a dPASP-based module for enforcing coherence in an argumentation
+structure parsing pipeline, drawing inspiration from the work of Stab and
+Gurevych}.
+
+The specific goals of this project include:
+
+\begin{itemize}
+    \item \textbf{Understanding the Existing Pipeline:} Thoroughly analyze the
+    argumentation structure parsing pipeline proposed by Stab and Gurevych, with
+     a specific focus on the role and implementation of the integer linear
+     programming step. This includes understanding the input to this step
+     (outputs of the component identification, classification, and relation
+     identification models) and its output (the coherent argumentation graph).
+    
+    \item \textbf{Conceptualizing a dPASP-based Coherence Model:} Develop a
+    probabilistic logic program in dPASP that can take the probabilistic outputs
+     of the preceding pipeline stages (or their representations) as input and
+     reason about the coherent structure of the argument. This will involve
+     defining neural predicates that can incorporate the uncertainty from the
+     earlier stages.
+    
+    \item \textbf{Integrating dPASP with the Pipeline:} Implement the
+    integration of the dPASP module into the existing argumentation parsing
+    pipeline, potentially using the publicly available resources from Stab and
+    Gurevych's work. This will involve handling the interface between the
+    machine learning classifiers and the dPASP framework.
+    
+    \item \textbf{Training the dPASP Model (if applicable):} Explore the
+    possibility of end-to-end or joint training of the dPASP module, potentially
+     leveraging dPASP's integration with PyTorch for automatic differentiation.
+     This might involve defining appropriate loss functions that consider the
+     desired properties of coherent argumentation structures.
+    
+    \item \textbf{Evaluating the dPASP-enhanced Pipeline:} Evaluate the
+    performance of the modified argumentation parsing pipeline, comparing it to
+    the original approach that uses integer programming. This evaluation will
+    likely involve using the argumentation structure annotated corpus created
+    by Stab and Gurevych and standard evaluation metrics for argumentation
+    mining, such as F1-score for component identification, classification, and
+    relation identification, as well as measures of overall graph coherence.
+    
+    \item \textbf{Analyzing the Results:} Analyze the strengths and weaknesses
+    of the dPASP-based approach, identifying potential improvements and
+    discussing the implications for the field of argumentation mining and
+    neural-symbolic reasoning.
+\end{itemize}
+
+\section{Planning Major Activities}
+
+The project will be conducted through the following major activities:
+
+\begin{itemize}
+    \item \textbf{Phase 1: Literature Review and Background Study (Month 1):}
+    \begin{itemize}
+        \item In-depth study of Stab and Gurevych's work on argumentation
+        structure parsing.
+        \item Comprehensive review of the dPASP framework, its syntax,
+        semantics, and capabilities.
+        \item Exploration of related work in neural-symbolic reasoning for NLP
+        tasks, including DeepProbLog, NeurASP, and other approaches to combining
+         deep learning and logical inference.
+        \item Understanding the ProbLog language, as DeepProbLog extends it.
+        \item Familiarization with the argumentation structure annotated corpus
+        from Stab and Gurevych.
+    \end{itemize}
+    
+    \item \textbf{Phase 2: Conceptualization and Design (Month 2):}
+    \begin{itemize}
+        \item Detailed design of the dPASP-based model for enforcing coherence
+        in argumentation structures.
+        \item Defining how the probabilistic outputs (or relevant information)
+        from the earlier stages of Stab and Gurevych's pipeline can be
+        represented and utilized within dPASP, possibly through neural
+        predicates.
+        \item Developing the logical rules and probabilistic choices within the
+        dPASP program to capture the desired properties of coherent
+        argumentation graphs (e.g., hierarchical structure, support and attack
+        relations, consistency of component types and relations).
+        \item Planning the integration strategy with the existing pipeline.
+    \end{itemize}
+    
+    \item \textbf{Phase 3: Implementation and Integration (Months 3-4):}
+    \begin{itemize}
+        \item Implementation of the dPASP-based coherence module using the dPASP
+        framework and potentially PyTorch.
+        \item Development of the necessary interface to connect this module with
+         the preceding stages of Stab and Gurevych's pipeline (which might
+         involve pre-trained machine learning models).
+        \item Handling data input and output formats for the dPASP module.
+    \end{itemize}
+    
+    \item \textbf{Phase 4: Training and Optimization (Month 5):}
+    \begin{itemize}
+        \item If end-to-end or joint training is feasible and deemed beneficial,
+         define the training data, loss functions, and optimization procedures.
+         This might involve adapting the training data and labels from Stab and
+         Gurevych's corpus or exploring new forms of supervision.
+        \item Tune the parameters of the dPASP model and the training process.
+    \end{itemize}
+    
+    \item \textbf{Phase 5: Evaluation (Month 6):}
+    \begin{itemize}
+        \item Evaluate the performance of the integrated argumentation parsing
+        pipeline using the Stab and Gurevych corpus.
+        \item Compare the results with the performance reported by Stab and
+        Gurevych for their original pipeline, focusing on the impact of
+        replacing the ILP step with dPASP.
+        \item Analyze the quantitative results based on standard argumentation
+        mining evaluation metrics.
+    \end{itemize}
+    
+    \item \textbf{Phase 6: Analysis and Thesis Writing (Month 7):}
+    \begin{itemize}
+        \item In-depth analysis of the results, including the strengths,
+        weaknesses, and potential of the dPASP-based approach.
+        \item Discussion of the findings in the context of related work and the
+        broader field of neural-symbolic reasoning and argumentation mining.
+        \item Writing and finalizing the graduate thesis document, including an
+        introduction, literature review, methodology, results, discussion, and
+        conclusion.
+    \end{itemize}
+\end{itemize}
+
+\section{Methodology}
+
+This project will employ a neural-symbolic approach, leveraging the strengths of
+both deep learning and logical reasoning. The core methodology will involve:
+
+\begin{itemize}
+    \item \textbf{Replication and Adaptation:} Starting with the well-defined
+    pipeline of Stab and Gurevych, the project will focus on replicating the
+    overall structure while specifically replacing the ILP-based coherence
+    enforcement with dPASP.
+    
+    \item \textbf{Probabilistic Logic Programming with Neural Predicates:} The
+    coherence of the extracted argument components and relations will be modeled
+     using dPASP, a framework that allows for defining probabilistic logic
+     programs with neural predicates. These neural predicates can be designed to
+     incorporate the confidence scores or probability distributions output by
+     the preceding machine learning models in the pipeline.
+    
+    \item \textbf{Answer Set Programming (ASP):} dPASP builds upon ASP, which
+    provides a declarative language for knowledge representation and reasoning.
+    ASP rules will be used to define constraints and preferences for a coherent
+    argumentation structure, such as the expected relationships between claims,
+    premises, and potentially major claims.
+    
+    \item \textbf{Integration with Deep Learning (PyTorch):} dPASP's tight
+    integration with PyTorch will be crucial for potentially training the
+    coherence model end-to-end or for leveraging pre-trained neural networks
+    from the earlier stages of the pipeline. Automatic differentiation
+    capabilities will be explored for learning the parameters of the dPASP
+    model, if applicable.
+    
+    \item \textbf{Experimental Evaluation:} The performance of the 
+    dPASP-enhanced pipeline will be rigorously evaluated on the annotated corpus
+    of persuasive essays created by Stab and Gurevych, using standard evaluation
+    metrics for argumentation mining. Comparison with the original ILP-based
+    approach will be a key aspect of the evaluation.
+\end{itemize}
+
+\section{Expected Outcomes and Contributions}
+
+This thesis project is expected to yield the following outcomes and
+contributions:
+
+\begin{itemize}
+    \item \textbf{A dPASP-based module for enforcing coherence in argumentation
+    structure parsing.} This module will demonstrate the application of deep
+    probabilistic logic programming to a challenging NLP task.
+    
+    \item \textbf{An evaluation of the effectiveness of dPASP compared to integer
+    programming for ensuring coherence in argumentation parsing.} This
+    comparison will provide insights into the strengths and weaknesses of
+    neural-symbolic approaches for this task.
+    
+    \item \textbf{Potential improvements in the accuracy and robustness of
+    argumentation structure parsing.} By leveraging the probabilistic reasoning
+    and learning capabilities of dPASP, the project may lead to a more accurate
+    and flexible approach to coherence enforcement.
+    
+    \item \textbf{A deeper understanding of the integration of deep learning and
+    logical reasoning for argumentation mining.} The project will contribute to
+    the growing body of work on neural-symbolic computing in NLP.
+    
+    \item \textbf{A documented implementation and evaluation of the proposed
+    approach}, which could serve as a foundation for future research in this
+    area.
+\end{itemize}
+
+\section{Timeline}
+
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Time Period} & \textbf{Major Activities} \\
+\hline
+Month 1 & Literature Review and Background Study \\
+\hline
+Month 2 & Conceptualization and Design of the dPASP Model \\
+\hline
+Months 3-4 & Implementation and Integration of the dPASP Module \\
+\hline
+Month 5 & Training and Optimization \\
+\hline
+Month 6 & Evaluation of the Integrated Pipeline \\
+\hline
+Month 7 & Analysis and Thesis Writing \\
+\hline
+\end{tabular}
+
+\section{Required Resources}
+
+\begin{itemize}
+    \item \textbf{Computational Resources:} Access to adequate computational
+    resources, including GPUs, for training and evaluating deep learning models
+    and running dPASP programs.
+    
+    \item \textbf{Software Resources:} Python programming environment, PyTorch
+    for deep learning, and dPASP framework. Access to additional libraries for
+    NLP tasks like tokenization, parsing, and evaluation.
+    
+    \item \textbf{Data Resources:} The annotated corpus of persuasive essays
+    created by Stab and Gurevych, potentially other argumentation mining
+    datasets for additional evaluation or transfer learning experiments.
+    
+    \item \textbf{Academic Resources:} Access to relevant scientific literature,
+    including papers on argumentation mining, neural-symbolic reasoning, and
+    probabilistic logic programming.
+\end{itemize}
+
+\section{Risks and Mitigation Strategies}
+
+\begin{itemize}
+    \item \textbf{Risk:} The integration of dPASP with the existing pipeline
+    components may face technical challenges or incompatibilities.
+    \textbf{Mitigation:} Start with a simple, well-defined interface between
+    components and gradually increase complexity. Develop a modular approach
+    that allows for easy testing and debugging of different parts of the system.
+    
+    \item \textbf{Risk:} The dPASP-based approach may not outperform the
+    original ILP approach in terms of accuracy or efficiency.
+    \textbf{Mitigation:} Design the experiments to focus not just on overall
+    performance metrics but also on specific aspects where dPASP might offer
+    advantages (e.g., handling uncertainty, integration with learning,
+    flexibility in defining constraints). This will ensure valuable insights
+    even if the approach does not outperform ILP on all metrics.
+    
+    \item \textbf{Risk:} The computational resources required for training and
+    evaluation may exceed available capacity.
+    \textbf{Mitigation:} Start with smaller-scale experiments and optimized
+    implementations, gradually scaling up as needed. Consider using pre-trained
+    models or transfer learning to reduce the computational burden.
+    
+    \item \textbf{Risk:} The project timeline may be affected by unforeseen
+    challenges or delays.
+    \textbf{Mitigation:} Build flexibility into the timeline and have
+    contingency plans for prioritizing essential components if time becomes
+    limited. Regular monitoring of progress against the timeline will help
+    identify potential delays early.
+\end{itemize}
+
+\section{Conclusion}
+
+This graduate thesis project aims to investigate the potential of deep
+probabilistic logic programming, specifically dPASP, for enhancing argumentation
+structure parsing. By replacing the integer linear programming step in Stab and
+Gurevych's pipeline with a dPASP-based approach, the project seeks to leverage
+the strengths of neural-symbolic reasoning for ensuring coherence in extracted
+argumentation structures. The expected outcomes include a novel implementation,
+empirical evaluation, and insights into the integration of deep learning and
+logical reasoning for this challenging NLP task. The results of this project
+could potentially lead to more accurate and flexible approaches to argumentation
+mining, with implications for applications in areas such as automated essay
+scoring, legal text analysis, and scientific discourse understanding.
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\end{document}
