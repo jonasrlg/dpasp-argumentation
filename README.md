@@ -1,4 +1,4 @@
-Thesis — Jonas Rodrigues Lima Gonçalves
+# Thesis — Jonas Rodrigues Lima Gonçalves
 
 This repository contains the thesis **"Enhancing Argumentation Structure Parsing
 with Deep Probabilistic Answer Set Programming"**, developed as part of the
