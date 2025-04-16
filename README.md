@@ -1,9 +1,8 @@
-# Undergraduate Thesis — Jonas Rodrigues Lima Gonçalves
+Thesis — Jonas Rodrigues Lima Gonçalves
 
-This repository contains the undergraduate thesis **"Enhancing Argumentation
-Structure Parsing with Deep Probabilistic Answer Set Programming"**, developed
-as part of the Institute of Mathematics and Statistics of the University of São
-Paulo.
+This repository contains the thesis **"Enhancing Argumentation Structure Parsing
+with Deep Probabilistic Answer Set Programming"**, developed as part of the
+Institute of Mathematics and Statistics of the University of São Paulo.
 
 ## Abstract
 
