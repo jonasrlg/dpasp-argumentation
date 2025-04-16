@@ -27,7 +27,10 @@ of the proposed method.
 .
 ├── text/
 │   ├── proposal/       # Thesis proposal
-│   └── main/           # Main thesis text
+│   └── thesis/         # Main thesis text
 │
 └── src/                # Source code for the implementation
+|
+├── docs/               # Documentation for the project, including GitHub Pages
+│   ├── index.html      # Home page for the GitHub Pages site
 ```
