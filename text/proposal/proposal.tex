@@ -37,29 +37,24 @@ While the ILP approach offers a way to integrate local predictions into a global
 structure, it can face limitations in terms of capturing complex probabilistic
 dependencies and being seamlessly integrated with end-to-end differentiable
 learning. Recent advancements in neural-symbolic reasoning, particularly in
-Deep Probabilistic Logic Programming frameworks like dPASP, offer promising
-alternatives. dPASP extends Answer Set Programming (ASP) with neural
-predicates, probabilistic choices, and tight integration with deep learning
-frameworks like PyTorch, enabling end-to-end training through automatic
-differentiation.
+Deep Probabilistic Logic Programming frameworks like Problog, Scallop and dPASP,
+offer promising alternatives. dPASP extends Probabilistic Answer Set Programming
+(PASP) with neural predicates, as probabilistic choices, and tight integration
+with deep learning frameworks like PyTorch, enabling end-to-end training through
+automatic differentiation.
 
-This thesis project initially aimed to investigate the potential of replacing the
+This thesis project aims to \textbf{investigate the potential of replacing the
 integer programming-based coherence enforcement step in Stab and Gurevych's
-argumentation parsing pipeline with dPASP. However, following discussions, the
-project will now adopt a phased approach. The first phase will focus on
-implementing the coherence enforcement using Scallop, a more efficient system,
-in collaboration with ongoing work by Vinícius. This will involve training the
-necessary models for argument component identification, node classification, and
-edge classification using the Stab and Gurevych dataset.
-
-The second phase, contingent on the progress of related work on dPASP 2.0, will
-explore a comparison with a dPASP-based implementation utilizing circuit-based
-inference. This phase aims to leverage advancements in dPASP, potentially
-incorporating additional constraints related to abstract argumentation theory.
+argumentation parsing pipeline with Scallop and dPASP}. By leveraging both
+Scallop's and dPASP's capabilities for probabilistic modeling and integration
+with neural networks, this project seeks to develop a more flexible and
+potentially more accurate approach to ensuring the coherence of extracted
+argumentation structures.
 
 The overarching goal is to contribute to the development of more effective
 neural-symbolic approaches for argumentation mining and to evaluate the
-capabilities of next-generation dPASP systems.
+capabilities of next-generation StarAI (Statistical Relational Learning)
+systems.
 
 \section{Objectives and Goals}
 
@@ -158,9 +153,9 @@ The project will be conducted through the following major activities:
 
 \section{Methodology}
 
-This project will primarily employ a logic-based approach for the initial
+This project will primarily employ a stratified-based approach for the initial
 implementation using Scallop, with a potential secondary exploration of a
-neural-symbolic approach using dPASP. The core methodology will involve:
+non-stratified approach using dPASP. The core methodology will involve:
 
 \begin{itemize}
     \item \textbf{Replication and Adaptation:} Starting with the well-defined
@@ -170,10 +165,9 @@ neural-symbolic approach using dPASP. The core methodology will involve:
 
     \item \textbf{Logic Programming with Scallop:} The coherence of the
     extracted argument components and relations will be modeled using Scallop,
-    a highly efficient deductive reasoning system. Logic rules will be defined
-    to capture the constraints and desired properties of a coherent
-    argumentation structure, such as acyclicity and the single sink property
-    of the argument graph.
+    a highly efficient deductive reasoning system. Probabilistic logic rules
+    will be defined to capture the constraints and desired properties of a
+    coherent argumentation structure.
 
     \item \textbf{Integration with Machine Learning Models:} The Scallop module
     will be integrated with the output of pre-trained (or trained as part of
@@ -206,7 +200,7 @@ contributions:
     \item \textbf{An evaluation of the effectiveness of Scallop compared to
     integer programming for ensuring coherence in argumentation parsing.} This
     comparison will provide insights into the strengths and weaknesses of
-    logic-based approaches for this task.
+    stratified-based approaches for this task.
 
     \item \textbf{Potential improvements in the accuracy and efficiency of
     argumentation structure parsing.} By leveraging the efficiency of Scallop,
@@ -214,8 +208,8 @@ contributions:
 
     \item \textbf{A deeper understanding of the integration of machine learning
     and logical reasoning for argumentation mining.} The project will
-    contribute to the field by exploring a practical application of logic
-    programming for coherence enforcement.
+    contribute to the field by exploring a practical application of probabilistic
+    logic programming for coherence enforcement.
 
     \item \textbf{A documented implementation and evaluation of the proposed
     approach}, which could serve as a foundation for future research in this
@@ -291,12 +285,13 @@ This thesis project will investigate the application of logic programming,
 specifically using the Scallop framework, for enhancing argumentation structure
 parsing. By replacing the integer linear programming step in Stab and Gurevych's
 pipeline with a Scallop-based approach, the project aims to leverage the
-efficiency and declarative power of logic for ensuring coherence. A secondary
-exploration of dPASP may be conducted depending on the progress of related work.
-The expected outcomes include a novel implementation, empirical evaluation, and
-insights into the integration of machine learning and logical reasoning for this
-challenging NLP task. The results of this project could potentially lead to more
-efficient and effective approaches to argumentation mining.
+efficiency and declarative power of probabilistic logic programming for ensuring
+coherence. A secondary exploration of dPASP may be conducted depending on the
+progress of related work. The expected outcomes include a novel implementation,
+empirical evaluation, and insights into the integration of machine learning and
+logical reasoning for this challenging NLP task. The results of this project
+could potentially lead to more efficient and effective approaches to
+argumentation mining.
 
 \bibliographystyle{apalike}
 \bibliography{references}
