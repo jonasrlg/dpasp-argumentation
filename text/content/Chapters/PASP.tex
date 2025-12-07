@@ -1,0 +1,672 @@
+% Chapter 3
+
+\chapter{Probabilistic Answer Set Programming} % Chapter title
+
+\label{ch:pasp} % For referencing the chapter elsewhere, use \autoref{ch:introduction}
+
+%----------------------------------------------------------------------------------------
+We choose ASP as the object of study within the context of
+Knowledge Representation (KR) and Prolog because it allows for a
+purely declarative representation of problems, which contrasts with
+Prolog \citep{kowalski1979algorithm}. This declarative nature means that
+the order of program rules and the order of sub-goals in a rule
+body does not matter to the processing, eliminating the need for
+explicit control knowledge \citep{eiter2009answer}.
+This differs from a principle like \textit{Logic + Control},
+characteristic of Prolog.
+
+% It is worth noting that the independence of explicit
+% control makes ASP purely declarative, which is a
+% desirable feature for a strictly declarative formalism
+% \citep{eiter2009answer}, even though there is an efficiency
+% trade-off for this feature.
+In the following sections, we
+present the foundational concepts of PASP, along with
+the properties and semantics necessary to understand the
+KC problem that is the focus of this work.
+
+%---------------------------------------------------------------
+
+\section{Notation and Definitions}
+
+% In the following sections, we assume familiarity with the concepts
+% of LP and follow definitions and notations based on the
+% works of \citep{eiter2009answer} and \citep{cozman2017semantics}.
+
+Logic Programming Languages (LPs) are built from fundamental concepts,
+such as logical variables, constants, predicates, atoms, terms, and rules.
+Constants will be represented by lowercase starting letters or
+natural numbers, such as \textit{turing}, \textit{vonNeumann},
+$0$, or $1$. Variables will be represented by uppercase starting
+letters, e.g., $X$, $Y$, $City$, $Name$. A term is defined
+either as a constant or a logical variable. Functional terms can
+be formed by combining terms with functions, e.g.,
+$isNeighbour(jonas, Name)$, where $isNeighbour$ acts as a
+boolean function.
+
+We define predicates as boolean functions that are used to
+represent properties or relations. An atom is written as
+$r(t_1, \dots, t_n)$, where $r$ is a predicate of arity $n$ and
+each $t_i$ is a term. We say that an atom is \textit{ground} if
+it only contains constants; therefore, it does not contain any
+logical variables. If an atom is not \textit{ground}, we say
+that it is \textit{non-ground}.
+
+% Note that the properties and relations represented through
+% predicates are made possible by the use of atoms.
+%
+Consider the following two atoms:
+$$neighbour(jonas, brazilian) \qquad isNeighbour(jonas, Name),$$
+the former expresses a property of \textit{jonas} and is \textit{ground},
+while the latter expresses the relationship \textit{isNeighbour}
+between the constant \textit{jonas} and the logical variable \textit{Name}.
+
+
+\section{Normal Logic Programs}
+
+% Even though definite programs (Prolog without negation) are
+% capable of representing a wide range of problems, their
+% limitation with respect to not using negation makes it difficult, if
+% not impossible, to represent some problems that require non-monotonic
+% reasoning \citep{eiter2009answer, brachman2004knowledge}. To
+% overcome this limitation,
+%
+We introduce the concept of programs that include negation in their
+\textit{body} rules, called Normal:
+
+\begin{definition}[Normal Logic Program]
+    A Normal Logic Program is a finite set of rules of the form:
+    \begin{lstlisting}
+        a :- b1, ..., bM, not c1, ..., not cN.
+    \end{lstlisting}
+    where $M, N \geq 0$; $a, b_i, c_i$ are atoms of a function-
+    free First Order Logic (FOL); and \textsc{not c} represents the negation as
+    failure of an atom $c$ ($\neg c$). We also introduce the
+    terminology of \textit{subgoals} in the body, which are either
+    atoms of the form $b_i$ (also called \textit{positive subgoals})
+    or $not \ c_i$ (\textit{negative subgoals}).
+\end{definition}
+
+\subsection{Herbrand Universe, Base and Interpretation}
+
+% A natural question that arises after the definition of this new
+% class of program is about its complexity. This answer largely
+% depends on the type of normal program that we are dealing with.
+% In search of a more formal explanation, we have to introduce
+% more concepts to capture a class of programs that we are
+% comfortable between the trade-off of expressiveness and
+% efficiency. We do this by firstly defining the concept of
+Now, we define the concept of \textit{Herbrand Universe} and
+\textit{Base}:
+
+\begin{definition}[Herbrand Universe]
+    The \textit{Herbrand Universe} $HU(P)$ of a logic program $P$
+    is the set of all terms that can be formed from constants
+    and functions in $P$ (w.r.t. a predefined vocabulary $L$).
+    Moreover, the \textit{Hebrand Base} $HB(P)$ of $P$ is the set
+    of all ground atoms that can be formed from terms and
+    predicates occurring $HU(P)$. Finally, ta \textit{Herbrand
+    Interpretation} is a subset of $HB(P)$, an interpretation
+    $I$ (a set denoting ground \textit{truths}) over $HU(P)$.
+\end{definition}
+
+\begin{example}
+    Consider the following logic program $P$
+    \citep{eiter2009answer}:
+    \begin{lstlisting}
+        h(0, 0).
+        t(a, b, r).
+        p(0, 0, b).
+        p(f(X), Y, Z) :- p(X, Y, Z'), h(X, Y), t(Z, Z', r).
+        h(f(X), f(Y)) :- p(X, Y, Z'), h(X, Y), t(Z, Z', r).
+    \end{lstlisting}
+    Then, the Herbrand Universe $HU(P)$ is the union of the set
+    containing all constants of $P$, $\{0, a, b, r\}$, and the
+    set of terms that can be formed from these constants
+    $\{f(0), f(a), f(b), f(r), f(f(0)), f(f(a)), \ldots\}$. Whereas,
+    the Herbrand Base, $HB(P)$ is given by the set of all ground atoms
+    assertions:
+
+    $$\{p(0, 0,0), p(a, a, a), \ldots, h(0, 0), \ldots, t(0, 0, 0),
+    t(a, a,a), \ldots\}$$
+
+    Finally, we list a few Herbrand Interpretations over
+    $HU(P)$:
+
+    \begin{itemize}
+        \item $I_1 = \emptyset$;
+        \item $I_2 = HB(P)$;
+        \item $I_3 = \{h(0, 0), t(a, b, r), p(0, 0, b)\}$.
+    \end{itemize}
+    Note that not all interpretations are consistent with the
+    program $P$. For instance, the interpretation $I_1$ is
+    contradictory, because it does not contain any
+    of the facts of $P$.
+\end{example}
+
+\subsection{Grounding of a Logic Program}
+
+With the notion of Herbrand Universe and Base, we can now have
+a moral formal definition of \textit{grounding}
+\citep{eiter2009answer}:
+
+\begin{definition}[Grounding]
+    We define a ground instance of a clause $C$, of a logic
+    program  $P$, as any clause $C'$ obtained from $C$ by
+    applying a substitution
+    \begin{displaymath}
+        \theta: Var(C) \rightarrow HU(P),
+    \end{displaymath}
+    where $Var(C) \in \mathcal{V}(P)$ is the set of variables
+    in $C$. Moreover, the grounding of a program $P$ is the set
+    of all possible ground instances of the clauses in $P$ and
+    is denoted by $ground(P) = \bigcup_{C \in P} ground(C)$ (the
+    union of all ground instances for all the clauses in $P$).
+\end{definition}
+
+\subsection{Interpretation of a Logic Program}
+
+Following the formalization of a concept like grounding, we have
+the definition of an interpretation of a logic program:
+
+\begin{definition}[Interpretation]
+    The interpretation $I$ of a logic program $P$ is a model of
+    $P$ that is compatible with the assertions in $P$. That is,
+    $I$ is a model of
+
+   \begin{itemize}
+        \item A ground clause $C =$ \prologinline{prolog}{a :- b1, ..., bM, not c1, ..., cN},
+        denoted $I \models C$, if either $\Set{a, c_1, \ldots,
+        c_N} \cap I \ne \emptyset$ or $\Set{b_1, \ldots, b_M}
+        \not \subseteq I$;
+        \item A clause $C$, denoted $I \models C$, if $I \models
+        C'$ for every $C' \in ground(C)$;
+        \item A program $P$, denoted $I \models P$, if
+        $I \models C$ for every clause $C \in P$.
+   \end{itemize}
+   That is: an interpretation $I$ is a model of a program $P$ if
+   it is compatible with all the ground instances of the clauses
+   of $P$.
+
+   We call a model $I$ of a program $P$ a \textit{minimal model},
+   if there is no other model $J$ of $P$ such that $J \subset
+   I$. Although, Normal Logic Programs can have multiple minimal models
+   for a program, it is true that Definite Logic Programs only
+   have one minimal model \citep{eiter2009answer}.
+\end{definition}
+
+\subsection{Immediate Consequence Operator}
+
+To establish the semantics of normal logic programs, we define the
+notion of the \textit{immediate consequence operator} $T_P$:
+
+\begin{definition}[$T_P$ Operator]
+    Let $P$ be a Normal Logic Program. The immediate consequence
+    $T_P: 2^{HB(P)} \rightarrow 2^{HB(P)}$ of a set of ground
+    atoms $I$ is defined as:
+
+    \begin{displaymath}
+        T_P(I) = \Set{ a \ | \begin{array}{l}
+            \text{\prologinline{a :- b1, ..., bM, not c1, ..., cN}}
+            \in ground(P),\\
+            \text{such that } \{b_1, \ldots, b_M\} \subseteq I
+            \text{ and } \{c_1, \ldots, c_N\} \cap I = \emptyset
+            \end{array}},
+    \end{displaymath}
+    where $ground(P)$ denotes the set of all ground atoms in $P$.
+
+    The most important property of the immediate consequence
+    operator is that it is \textit{monotone}
+    \citep{bogaerts2015knowledge} and thus, by the Knaster-Tarki
+    Theorem, has a least fixed point, called $lfp(T_P)$, which is
+    the least model of $P$ \citep{eiter2009answer}. Moreover, the
+    sequence obtained by iterating $T_P$ starting from the empty set
+    converges to the fixed point $lfp(T_P)$.
+\end{definition}
+
+\subsection{Negation and Stratification}
+
+Even though different classes of Logic Programs, such as Definite
+and Normal programs, try to capture the intrinsic duality of
+expressiveness versus efficiency in the field of KR and
+LPs, these definitions only take into account the different
+types of rules that can be present in a program, but not their
+structure.
+
+However, understanding the impact of the negation operator's
+introduction to program rules is of utmost importance, as it
+directly creates the possibility of having a collection
+of multiple minimal models. This change creates the necessity of
+defining a proper semantic for attributing meaning to negation
+in logic problems, where there are two main approaches:
+
+\begin{itemize}
+    \item Define a single model for a program, which possibly
+    tries to capture problematic classes of programs due to
+    negation possibly creating multiple minimal models. This
+    approach has success when dealing with \textit{stratified}
+    programs, which we define later. For general normal
+    programs, the most popular semantics following this approach
+    is based on the \textit{well-founded semantics} (that we
+    do not define here for the sake of brevity)
+    \citep{eiter2009answer, van1991well}.
+    \item Define a collection of models for a program,
+    abandoning the necessity of only one model. This approach
+    gives rise to ASP and its semantics, such as the
+    \textit{stable model semantics}, which we also define later.
+\end{itemize}
+
+One possible way of determining whether a program is
+\textit{stratified} or not is by finding an ordering for the
+evaluation of its rules, such that the value of negative
+literals can be predicted by the values of positive literals
+\citep{eiter2009answer}. But we can also define a more general
+approach by analyzing the structure of the program, that is,
+the dependency graph:
+
+\begin{definition}[Dependency Graph]
+    Let $P$ be a ground program. Then, its dependency (multi) graph
+    $dep(P)$ is a tuple of the form $(V, E)$, where
+    \begin{itemize}
+        \item A set of nodes $V$, where each node $v \in V$ is
+        a ground atom occurring in $P$; and
+        \item A set of edges $E$, where each edge $(v, w) \in E$
+        ($v$ pointing to $w$, $v \rightarrow w$) occurs if and
+        only if $v$ is the head atom of a rule whose body contains
+        a literal $w$. If the literal is negative, then the edge is
+        marked as $*(v, w)$ ($v \rightarrow^* w$).
+    \end{itemize}
+
+    We call a graph \textit{acyclic} if its grounded dependency graph
+    does not contain any (directed) cycles.
+\end{definition}
+
+By utilizing the notion of a dependency graph, we can define the
+concept of stratification:
+
+\begin{definition}[Stratification]
+    Let $P$ be a logic program, and let $G = (V, E)$ be its
+    dependency graph. A stratification of $P$ is a partition
+    $\Sigma = \Set{S_i \mid i \in \Set{1, \ldots, n}}$ of the
+    predicates of $P$ into $n$ non-empty pairwise disjoint
+    sets, such that:
+    \begin{enumerate}
+        \item If $v \in S_i$, $w \in S_j$, and $(v, w) \in E$,
+        then $i \le j$ (positive dependency must be within the
+        same stratum or to a higher/later stratum); and
+        \item If $v \in S_i$ and $*(v, w) \in E$, then $i > j$
+        (negative dependency must be to a strictly lower/earlier
+        stratum).
+    \end{enumerate}
+
+    A program is called \textit{stratified} if it has some
+    stratification $\Sigma$, and its respective partitions $S_i$
+    are called \textit{strata}.
+\end{definition}
+
+\subsection{Stable Model Semantics}
+
+As stated before, Normal Logic Programs can have multiple minimal models,
+which is a consequence of the introduction of negation in the
+program rules. Following, we have a program where the
+introduction of negation creates multiple minimal models:
+
+\begin{example}
+    Let $P$ be the following logic program:
+    \begin{lstlisting}
+        researcher(computability).
+        machine(X) :- researcher(X), not lambda(X).
+        lambda(X) :- researcher(X), not machine(X).
+    \end{lstlisting}
+
+    Then, note that the program $P$ is not stratified.
+    Furthermore, there is not only one minimal model for $P$,
+    but two:
+    \begin{enumerate}
+        \item $M_1 = \Set{researcher(computability),
+        machine(computability)}$; and
+        \item $M_2 = \Set{researcher(computability),
+        lambda(computability)}$.
+    \end{enumerate}
+\end{example}
+
+Hence, to attribute meaning to negation, we first introduce the
+concept of \textit{reduction} of a program, and then introduce
+one of the most important semantics for logic programs, the
+Stable Model semantics.
+
+\begin{definition}[Reduct (short GL-reduct)]
+    Let $P$ be a Normal Logic Program and $I$ be an interpretation.
+    Then, the \textit{reduct} of $P$ w.r.t $I$, denoted $P^I$,
+    is obtained by:
+
+    \begin{enumerate}
+        \item Grounding the program $P$;
+        \item Removing rules with $not c$ in the body, for each
+        $c \in I$; and
+        \item Removing all negative literals $not c$ from the
+        remaining rules.
+    \end{enumerate}
+\end{definition}
+
+Hence, a Gelfond-Lifschitz reduction produces a program that
+enforces the truth of the atoms in the interpretation $I$. The
+first condition, when a literal $c \in I$, makes the negative
+subgoal $not c$ false. Consequently, any ground rule containing
+$not c$ in its body is removed, as its body cannot be satisfied,
+and it will not contribute to the least model. When the second
+condition occurs, if a literal $c \notin I$, it is possible to
+assume that $not c$ is indeed true; therefore, it can be removed
+from the (body of the) rule.
+
+A direct consequence of the definition of the reduct is that
+the reduction product, $P^I$, is a positive program. Using this
+property, it is easy to see that $P^I$ has a least model
+$LM(P^I)$; and, if $P^I$ is consistent (if it does not present a
+contradiction), then the least model of $P^I$ is $I$ itself. This
+bijective relation between $P^I$ and $I$, of one being able to
+obtain $I$ from $P^I$ due to it being a least model of the
+program, and $P^I$ being the reduct of $P$ w.r.t. $I$, is the
+basis of the Stable Model semantics:
+
+\begin{definition}[Stable Model]
+    Let $P$ be a normal logic ground program. An interpretation
+    $I$ is a stable model of $P$ if $I$ is a minimal model of
+    the reduct $P^I$ of $P$ w.r.t. $I$.
+\end{definition}
+
+Since a normal program may have several stable models, it is
+possible to have multiple interpretations that are stable
+models. Therefore, a normal program may have several stable
+models (or even none, as we stated earlier). For instance, the
+example above has two stable models, $M_1$ and $M_2$.
+
+An interesting property of stable models is that they are fixed
+points of the immediate consequence operator $T_P$. Formally, a
+stable model $I$ of $P$ satisfies $T_P(I) = I$ (but the converse
+is not necessarily true) \citep{eiter2009answer}.
+
+\subsection{Reasoning}
+
+There are three types of reasoning with logic programs under the
+stable model semantics. We enumerate them in order of
+complexity, where the former can be reduced as an instance of
+the latter:
+
+\begin{enumerate}
+    \item \textbf{Consistency} (Satisfiability): decide whether a
+    program has at least one answer set (consistent);
+    \item \textbf{Brave reasoning}: given a ground literal $Q$,
+    decide whether some (at least one) answer set satisfies $Q$.
+    If it does, $Q$ is called a \textit{brave consequence} of the
+    program; and
+    \item \textbf{Cautious reasoning}: given a ground literal
+    $Q$, decide whether all answer sets satisfy $Q$. If all of
+    them do, $Q$ is called a \textit{cautious consequence}.
+\end{enumerate}
+
+\section{Probabilistic Logic Programming}
+
+Before defining PLPs, we first need to establish the semantics
+for programs incorporating probabilistic distributions. One of the
+first works that supports the semantics we are going to define is the work
+by \citep{sato1995statistical}, where the idea behind a
+distribution semantics is to have probability associated with a
+set of \textit{independent} events in such a way that a unique
+probability measure is induced over all interpretations of
+ground atoms \citep{cozman2020joy}.
+
+As one could imagine from the date of Sato's work, the semantics
+was not specially designed for ASP.
+One of the consequences is that it is not possible to
+apply Sato's semantics to general ASP programs; his idea of
+distribution semantics fails to guarantee the specification of
+a single probability distribution over ground atoms under the
+usual two-valued logic \citep{cozman2020joy}. Thus, the
+extension of Sato's distribution semantics becomes necessary in
+order to specify probability measures by ASP programs.
+
+Hence, we define PLPs as a pair $(P, PF)$, where $P$ is a
+\textbf{logic program} and $PF$ is a set of \textbf{probabilistic
+facts}:
+
+\begin{definition}[Probabilistic Fact]
+    A probabilistic fact is a pair consisting of an atom $A$ and
+    a probability value $\alpha$, which we denote by $\alpha ::
+    A$ \citep{cozman2017semantics}.
+
+    Furthermore, atoms of probabilistic facts may contain logical
+    variables ($\alpha :: r(X_1, \ldots, X_n)$), and are therefore
+    unground. When considering this case, we interpret such a
+    probabilistic fact as the set of all grounded probabilistic
+    facts, obtained after grounding the variables in the atom.
+\end{definition}
+
+Properties from logic programs, such as \textit{stratification},
+\textit{acyclicity}, and \textit{definiteness}, are reflected in
+PLPs as well. For instance, a PLP $(P, PF)$ is said to
+be acyclic if the dependency graph of $P$ is acyclic.
+
+The definition of PLPs does not directly extend the class
+of programs that we were used to; it only associates probabilities
+through the use of probabilistic facts. A more in-depth
+definition would be to extend the notion of Extended Disjunctive
+Logic Programming (EDLP) by adding probabilistic facts to the heads
+of the rules:
+
+\begin{definition}[Annotated Disjunctive Rules]
+    A probabilistic extension of an EDLP is called
+    Annotated Disjunctive Rules (ADR), a set of rules of the form:
+    \begin{lstlisting}
+        p1::a1; ...; pK::aK :- b1, ..., bM, not c1, ..., not cN,
+    \end{lstlisting}
+    where $p_1, \ldots, p_k$ are nonnegative real values
+    whose sum is smaller than or equal to 1. In this sense, a
+    probabilistic fact of the form
+    \begin{lstlisting}
+        p::a
+    \end{lstlisting}
+    is a special case (and a syntactic sugar) of an ADR, where
+    \prologinline{prolog}{p::a} is equivalent to
+    \prologinline{prolog}{p::a (1-p):-f}, where $f$ is an atom
+    that is never true \citep{geh2023dpasp}.
+\end{definition}
+
+\subsection{Probabilistic Answer Set Programming}
+
+Although we have briefly defined Sato's distribution semantics,
+there is a need for a more formal description. Furthermore,
+this distribution semantics that Sato proposed is not well
+adapted to consider ASP programs.
+
+It is important to note that we are defining a probability
+distribution over PLPs, and not logical ones. This makes
+probabilistic semantics over PLPs agnostic w.r.t. the
+logical semantics of the program, which is particularly useful
+when considering non-stratified programs that may use a
+\textit{stable model} or \textit{well-founded} semantics
+\citep{eiter2009answer, maua2020complexity}.
+
+\begin{definition}[Probabilistic Choice]
+    A PLP $(P, PF)$ with $n$ probabilistic facts can
+    generate a total of $2^n$ different logic programs: one for
+    each possible assignment of the probabilistic facts (when
+    considering binary probabilistic facts). The assignment of
+    a probabilistic fact $\alpha :: A$ can be seen as choosing
+    to keep or erase the fact $A$ from the program
+    \citep{cozman2017semantics}.
+
+    As commented before, these \textit{probabilistic choices} are
+    assumed to be independent.
+\end{definition}
+
+\begin{definition}[Total Choice]
+    A \textit{total choice} $\theta$ for a PLP $(P, PF)$ is
+    a subset of the set of grounded probabilistic facts. Thus,
+    $\theta$ can be interpreted as a set of ground facts that
+    are probabilistically selected to be included in $P$, while
+    all other ground facts obtained from probabilistic facts are
+    discarded \citep{cozman2017semantics}.
+
+    Because the probabilistic choices are assumed to be
+    independent, the probability of a total choice can be easily
+    computed by the product over the grounded probabilistic
+    facts, where a probabilistic fact $\alpha :: A$ that is
+    chosen to be included contributes with a factor of $\alpha$,
+    and, if it is discarded, it contributes with a factor of
+    $(1-\alpha)$ \citep{cozman2017semantics}.
+
+    An important property of total choices is that, for a total
+    choice $\theta$, the induced logic program (w.r.t. $P$),
+    denoted by $P \cap PF^{\downarrow \theta}$, is a normal
+    logic program \citep{cozman2017semantics, geh2023dpasp}.
+    Therefore, for an ADR, a total choice $\theta$ induces
+    a normal logic program, where each rule $r$ from the
+    ADR is transformed into a rule of the form
+    \begin{lstlisting}
+        a_i :- b1, ..., bM, not c1, ..., not cN,
+    \end{lstlisting}
+    where $i$ is the corresponding index of the probabilistic
+    choice in $\theta$ \citep{geh2023dpasp}.
+\end{definition}
+
+Whenever we have a total choice $\theta$ for a PLP such
+that $P \cup PF^{\downarrow \theta}$ is stratified, the
+resulting induced program has only one \textit{stable model}, as
+we have seen in the earlier sections. Hence, Sato's distribution
+semantics can be naturally extended to this class of programs, and
+does not create any controversial interpretation of the
+probabilistic semantics.
+
+A more interesting case is when we have a total choice $\theta$
+for a PLP that induces a (non-stratified) logical program
+with multiple \textit{stable models}. In this case, we have the
+need to define semantics capable of handling this situation:
+the Credal and \textsc{MaxEnt} semantics, which we define next.
+
+First, we define the notion of \textit{consistency} for
+PLPs:
+
+\begin{definition}[Consistency of Probabilistic Logic Programs]
+    A PLP $(P, PF)$ is \textit{consistent} if, for each
+    total choice $\theta$, the induced logic program $P \cup
+    PF^{\downarrow \theta}$ has at least one stable model
+    \citep{cozman2017semantics}.
+\end{definition}
+
+Given that we have a definition to express PLPs that are
+able to have stable models, independent of the total choice, we
+are capable of formalizing the notion of a \textit{probability
+model} for PLPs:
+
+\begin{definition}[Probability Model for Probabilistic Logic
+    Programs]
+    A \textit{probability model} for a consistent PLP $(P,
+    PF)$ is a probability measure $\mathbb{P}$ over
+    interpretations of $P$, such that
+    \citep{cozman2017semantics}:
+    \begin{enumerate}
+        \item Every interpretation $I$ with $\mathbb{P}(I) > 0$
+        is a stable model of (the normal logic program) $P \cup
+        PF^{\downarrow \theta}$ w.r.t. the total choice $\theta$
+        that agrees with $I$ on the probabilistic facts; and
+        \item The probability of each total choice $\theta$ is
+        the product of the probabilities for all individual
+        choices in $\theta$:
+        $$\mathbb{P}(\Set{I \mid I \cap C = C}) = \prod_{\alpha
+        :: A | A \in C} \alpha \prod_{\alpha :: A | A \notin C}
+        (1 - \alpha).$$
+    \end{enumerate}
+\end{definition}
+
+\subsubsection{Credal Semantics}
+
+As the first PASP semantics to be described, we introduce
+the \textit{credal semantics}, which is based on the idea of
+using intervals (containing \textit{upper} and \textit{lower})
+to represent the uncertainty of the probability
+\citep{lukasiewicz2005probabilistic,
+lukasiewicz2007probabilistic}.
+
+\begin{definition}[Credal Semantics]
+    The \textit{credal semantics} for a consistent PLP $(P,
+    PF)$ is the set of all probability models for $(P, PF)$
+    \citep{cozman2017semantics}.
+
+    Moreover, the credal semantics is a \textit{closed} and
+    \textit{convex} set of probability measures, and corresponds
+    to the set of all probability measures that dominate an
+    infinitely monotone Choquet capacity
+    \citep{cozman2017semantics} (more about Choquet capacities
+    can be found in \cite{cozman2020joy}). As such, the credal
+    semantics of any set of models $\mathcal{M}$ is
+    characterized by an interval $[\underline{\mathbb{P}}(\mathcal{M}),
+    \overline{\mathbb{P}}(\mathcal{M})]$:
+
+    \begin{equation}
+        \underline{\mathbb{P}}(\mathcal{M}) = \sum_{\theta \in
+        \Theta : \Gamma(\theta) \subseteq \mathcal{M}} \mathbb{P}
+        (\theta), \qquad
+        \overline{\mathbb{P}}(\mathcal{M}) = \sum_{\theta \in \Theta
+        : \Gamma(\theta) \cap \mathcal{M} \ne \emptyset} \mathbb{P}
+        (\theta),
+        \label{eq:credal_semantics}
+    \end{equation}
+
+    where $\Theta$ is the set of all total choices, and $\Gamma
+    (\theta)$ is the set of stable models associated with the
+    total choice \citep{cozman2017semantics, cozman2020joy}.
+
+    Given a PLP, this interval can be computed for a set
+    of assignments $\mathbf{Q}$ for ground atoms by the
+    following algorithm \citep{cozman2017semantics}:
+
+    \begin{enumerate}
+        \item Given a PLP $(P, PF)$ and $\mathbf{Q}$,
+        initialize variables $a$ and $b$ with 0;
+        \item For each total choice $\theta$, compute the set $S$
+        of all stable models of $P \cap PF^{\downarrow \theta}$,
+        and:
+            \begin{enumerate}
+                \item If $\mathbf{Q}$ is \textit{true} in every
+                stable model in $S$, then $a \leftarrow a + P(
+                \theta)$; and
+                \item If $\mathbf{Q}$ is \textit{true} in some
+                stable model of $S$, then $b \leftarrow b + P(
+                \theta)$.
+            \end{enumerate}
+        \item Return $[a, b]$ as the interval $[\underline{\mathbb{P}}(
+        \mathbf{Q}),\overline{\mathbb{P}}(\mathbf{Q})]$.
+    \end{enumerate}
+
+    An interesting relation between the credal semantics and
+    reasoning over Answer Sets is that the computation of the
+    upper probability, $\overline{\mathbb{P}}(\mathbf{Q})$,
+    involves \textit{brave reasoning}, and the computation of
+    the lower probability, $\underline{\mathbb{P}}(\mathbf{Q})$,
+    involves \textit{cautious reasoning}
+    \citep{cozman2017semantics}.
+\end{definition}
+
+\subsubsection{Maximum-Entropy Semantics}
+
+To conclude this chapter, we define one of the most famous
+semantics for PASP: the \textit{Maximum
+Entropy} semantics, also known as \textsc{MaxEnt} semantics:
+
+\begin{definition}[Maximum Entropy (MaxEnt) Semantics]
+    This semantics is based on the principle of maximum entropy:
+    evenly dividing the probability mass among all stable
+    models of a program (induced by a total choice). Formally,
+    for a stable model $\mathcal{M}$, the probability
+    $\mathbb{P}(\mathcal{M})$ is given by:
+
+    $$\mathbb{P}(\mathcal{M}) = \sum_{\theta : \mathcal{M} \in
+    \Gamma(\theta)} \frac{\mathbb{P}(\theta)}{n},
+    $$
+
+    where $n$ is the number of stable models associated with
+    the total choice $\theta$ \citep{cozman2017semantics}.
+\end{definition}
+
+%---------------------------------------------------------------

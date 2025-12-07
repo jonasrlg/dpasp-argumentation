@@ -1,0 +1,14 @@
+graph "" {
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    x ;
+    x [label="X"] ;
+    x -- alpha ;
+    alpha [label="&#945;"] ;
+    x -- beta [style=dashed] ;
+    beta [label="&#946;"] ;
+
+    { rank=same ; alpha ; beta ; }
+}

@@ -1,0 +1,90 @@
+%!TeX root=../tese.tex
+%("dica" para o editor de texto: este arquivo é parte de um documento maior)
+% para saber mais: https://tex.stackexchange.com/q/78101
+
+% As palavras-chave são obrigatórias, em português e em inglês, e devem ser
+% definidas antes do resumo/abstract. Acrescente quantas forem necessárias.
+\palavraschave{Programação Lógico Probabilística, Compilação de Conhecimento,
+Circuito Probabilísticos}
+
+\keywords{Probabilistic Logic Programming, Knowledge Compilation,
+Probabilistic Circuits}
+
+% O resumo é obrigatório, em português e inglês. Estes comandos também
+% geram automaticamente a referência para o próprio documento, conforme
+% as normas sugeridas da USP.
+\abstract{
+Advances in Probabilistic Logic Programming (PLP) and Probabilistic Inference (PI) have
+demonstrated that Knowledge Compilation (KC) techniques, which compile probabilistic
+logic programs into Answer Set Programs (ASP), are essential for
+fast and exact inference. Despite the close relationship between Circuit Theory
+and the complexity of logical inference, it is possible to exploit the structure
+of PLPs to construct more succinct circuits that can efficiently answer
+probabilistic queries.
+
+Although previous research has shown that the compilation of stratified programs
+can be achieved using various techniques, such as $T_P$-consequence or Loop
+Formulas, little has been explored in the context of PASP compilation,
+apart from top-down compilation approaches that translate the program into a
+Conjunction Normal Form (CNF) and subsequently apply knowledge compilation techniques.
+Decomposable Negation Normal Form (DNNF) compilation-based methods have also been
+investigated.
+
+Drawing inspiration from successful works on the compilation of stratified
+PLP languages, this research aims to leverage the tractability and bottom-up
+nature of a special class of Arithmetic Circuits (AC), called Probabilistic
+Sentential Decision Diagrams (PSDDs), to compile PASP programs into PSDDs under the
+\textit{Max Entropy} and \textit{Credal} semantics. Furthermore, this bottom-up
+approach enables structural optimizations through modifications to the variable
+tree that governs the structure of the circuits, resulting in more succinct
+representations.
+
+Finally, PSDDs are capable of performing exact inference in polynomial time and
+support numerous algorithms for learning and regularization, specifically designed
+for use in Probabilistic Circuits (PCs). This further underscores the potential of
+PSDDs as a tractable representation for PLPs and highlights the need to explore
+efficient heuristics for dynamically modifying the variable tree structure when
+compilingPASP programs into PSDDs.
+}
+
+\resumo{
+Avanços em Programação Lógica Probabilística e Inferência Probabilística
+demonstraram que técnicas de Compilação de Conhecimento, as quais compilam
+programas lógicos probabilísticos em Programas de Conjunto de Respostas,
+são essenciais para inferência rápida e exata. Apesar da estreita relação
+entre a Teoria de Circuitos e a complexidade da inferência lógica, é possível
+explorar a estrutura dos Programas Lógicos Probabilísticos para construir
+circuitos mais concisos que podem responder eficientemente a consultas
+probabilísticas.
+
+Embora pesquisas anteriores tenham mostrado que a compilação de programas
+estratificados pode ser alcançada usando várias técnicas, como a
+consequência do operador $T_P$ ou \textit{Loop Formulas}, pouco foi
+explorado no contexto da compilação de Programas de Conjunto de Respostas
+Probabilísticos, à parte de abordagens de compilação top-down (de cima
+para baixo) que traduzem o programa em uma Forma Normal Conjuntiva e
+subsequentemente aplicam técnicas de compilação de conhecimento. Métodos
+baseados na compilação para Forma Normal Negativa Decomponível também
+foram investigados.
+
+Inspirada em trabalhos bem-sucedidos sobre a compilação de linguagens de
+Programação Lógica Probabilística estratificada, esta pesquisa visa
+alavancar a tratabilidade e a natureza bottom-up (de baixo para cima) de
+uma classe especial de Circuitos Aritméticos, chamados Diagramas de
+Decisão Sentencial Probabilísticos, para compilar Programas de Conjunto
+de Respostas Probabilísticos nestes diagramas sob a semântica de
+Entropia Máxima e Credal. Além disso, essa abordagem bottom-up permite
+otimizações estruturais por meio de modificações na árvore de variáveis
+que governa a estrutura dos circuitos, resultando em representações mais
+concisas.
+
+Finalmente, os Diagramas de Decisão Sentencial Probabilísticos são capazes
+de realizar inferência exata em tempo polinomial e suportam inúmeros
+algoritmos para aprendizado e regularização, especificamente projetados
+para uso em Circuitos Probabilísticos. Isso reforça ainda mais o potencial
+dos Diagramas de Decisão Sentencial Probabilísticos como uma representação
+tratável para Programação Lógica Probabilística e destaca a necessidade de
+explorar heurísticas eficientes para modificar dinamicamente a estrutura
+da árvore de variáveis ao compilar Programas de Conjunto de Respostas
+Probabilísticos nos Diagramas de Decisão Sentencial Probabilísticos.
+}

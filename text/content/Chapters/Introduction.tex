@@ -1,0 +1,274 @@
+% Chapter 1
+
+\chapter{Introduction} % Chapter title
+
+\label{ch:introduction} % For referencing the chapter elsewhere, use \autoref{ch:examples}
+
+%----------------------------------------------------------------------------------------
+
+Artificial Intelligence (AI) has achieved unprecedented prominence in both
+research and public discourse, largely driven by remarkable progress in large
+Neural Networks (NNs). From breakthroughs in Computer Vision with
+\textit{AlexNet} \citep{alom2018history} in 2012, to mastering complex strategic
+games with \textit{AlphaGo} \citep{wang2016does} in 2016, advancing biological
+discovery through \textit{AlphaFold} \citep{ruff2021alphafold} in 2018, and
+revolutionizing Natural Language Processing (NLP) with Large Language Models
+(LLMs) \citep{radford2018improving, radford2019language, brown2020language,
+openai2024gpt4}, deep learning has reshaped what the field can accomplish.
+
+% \section{The Reign of Deep Learning}
+
+% The utilization of Deep Learning has proven to be very effective
+% for learning complex data representations. By utilizing
+% specialized components of their network architectures, such as
+% convolutional layers, recurrent layers, attention mechanisms,
+% and applying inductive biases learned from the data, these
+% networks are able to reflect nuances underlying the data and
+% avoid the need for manual feature engineering
+% \citep{timeseries_deep_survey, deep_tutorial}.
+
+% The applications of this class of models were vast in the last
+% decades, ranging from the popular Computer Vision network
+% \textit{AlexNet} \citep{alom2018history} in 2012; to
+% beating humans in games that were thought to be impossible for
+% data-driven approaches, such as the board game Go, with
+% \textit{AlphaGo} \citep{wang2016does} in 2016; and advancing
+% Biological Sciences, in the protein folding problem, with
+% \textit{AlphaFold} \citep{ruff2021alphafold} in 2018.
+
+% In the last couple of years, the developments in AI that
+% received special attention were related to Natural Language Processing (NLP). The utilization
+% of \textit{Transformers}, with their self-attention mechanism, has
+% revolutionized the field, leading to historic technological leaps in many
+% models, such as \textit{BERT} \citep{devlin2019bert},
+% \textit{PaLM} \citep{chowdhery2022palm}, and GPTs
+% \citep{radford2018improving, radford2019language,
+% brown2020language, openai2024gpt4}.
+
+% \section{Why not a thesis about LLMs?}
+
+% While enlarging the size of models seemed to be a good strategy,
+% models such as \textit{Mistral} \citep{jiang2023mistral} and
+% \textit{Phi-2} \citep{javaheripi2023phi2} showed that smaller
+% language models could achieve similar, if not better, results
+% than the largest models available in some tasks. This raised
+% questions about the need for larger models, not only from a
+% performance point of view but also from financial and
+% environmental perspectives, as the monetary costs and energy consumption
+% used to train and perform inference on these models are enormous
+% \citep{samsi2023words, luccioni2023estimating}.
+
+% However, the monetary impact and carbon footprint are not the
+% only problems related to the use of LLMs. The lack of
+% interpretability, derived from the black-box nature of the
+% automatic knowledge extraction of these models, is a major
+% ethical concern over purely data-driven approaches
+% \citep{zou2018ai, mittelstadt2019principles,
+% siau2020artificial}.
+%
+
+While the pace of innovation continues to accelerate \citep{chang2023survey,
+gunasekar2023textBooks, wu2023comparative}, an equally pressing concern has
+emerged: the lack of transparency and trustworthiness in these purely
+data-driven systems \citep{sun2024trustllm, huang2023survey, liu2023trustworthy}.
+Such models excel at recognizing patterns from massive datasets but often fail
+to reason about them in a human-understandable way. As a result, their decisions
+are frequently opaque, difficult to verify, and prone to biases inherited from
+data.
+
+This growing gap between performance and interpretability has reignited
+interest in \textit{Neuro-Symbolic Artificial Intelligence (NeSy)}
+\citep{sarker2021neuro, garcez2022neural},
+an approach that seeks to combine the statistical learning capabilities of
+Neural Networks with the structured reasoning and explainability of symbolic
+systems. By bridging these two paradigms, Neuro-Symbolic AI aspires to enable
+more reliable, transparent, and generalizable forms of intelligence.
+
+In order to tackle these issues, recent research has been
+studying several different approaches, such as the utilization
+of Logical Neural Networks (LNNs) \citep{riegel2020logical,
+qu2019probabilistic}, a Neuro-symbolic framework that aims to combine the best
+of both worlds: the expressiveness of logic and the learning
+capabilities of Neural Networks. In this type of model, every
+neuron has a meaning as a component of a formula in a weighted
+real-valued logic, yielding a highly interpretable disentangled
+representation \citep{riegel2020logical}. Inference is
+omnidirectional rather than focused on predefined target
+variables and corresponds to logical reasoning, including
+classical first-order logic theorem proving as a special case
+\citep{riegel2020logical}.
+
+While this approach is promising, due to its one-to-one
+correspondence to systems of logical formulae and specification
+through logical constraints, it requires not only adaptation to
+the Neuro-symbolic framework but also a deep understanding of
+how to encode the logical constraints into the Neural Networks.
+
+Another approach that has been gaining attention is the use of
+Probabilistic Logic Programming (PLP): logic programming languages,
+like Prolog, that leverage probabilistic inference to handle uncertainty and
+complexity in data. By integrating the symbolic capabilities of
+these languages with Neural Networks, one is capable of creating
+hybrid systems that use Neural Networks to estimate the probability
+of predicates and their relationships. Notable deep PLP
+systems are: \textsc{DeepProbLog}
+\citep{manhaeve2018deepproblog} and \textsc{NeurASP}
+\citep{yang2023neurasp}.
+
+%A similar, but more general approach are Probabilistic Programming Languages (PPLs), that are less
+%focused on the Logic Programming aspect, focusing instead on the probabilistic
+% inference capabilities. A notable system of this class of languages
+% is \textsc{Pyro} \citep{bingham2019pyro}, which has been
+% gaining popularity due to unifying the probabilistic programming
+% and deep learning approaches.
+
+An advantage of using a PLP for deep learning tasks is
+that it allows the user to specify the logical constraints in a
+more natural way, with well-established syntax from languages
+such as Prolog or Answer Set Programming (ASP), and to leverage the highly
+optimized logical inference engines for these languages. Moreover, it
+not only provides a more explainable framework but also
+has been shown to be a more performant method for a wide range of
+tasks \citep{manhaeve2018deepproblog, yang2023neurasp}.
+
+%Another advantage of this
+% framework that uses logic on top of neural networks is that it
+% allows the usage of pre-trained models as neural predicates,
+% which can be used just for inference on a Knowldge Base (KB) or to be
+% fine-tuned, taking into consideration not only the data but
+% the whole program during the training process.
+
+% Thus, PLPs languages that take into consideration neural
+% predicates are a promising approach to tackle the issues with
+% Deep Learning models, without the need for training another
+% highly specialized network from the ground up.
+
+\section{Current Limitations of PLPs}
+
+Although there are promising results in the field of PLPs,
+the addition of logical constraints to neural systems is a
+double-edged sword. While logic is a powerful tool for
+representing knowledge and can be used to audit the reasoning of
+a program, it is also known to be intractable in many cases,
+especially when dealing with more expressive logics, such as
+first-order logic \citep{levesque1986knowledge,
+levesque1987expressiveness}. Thus, the logical inference of this
+type of model suffers from the same problems.
+
+On the other hand, Probabilistic Inference is also known to be difficult, and
+some traditional approximate sampling methods, such as Gibbs
+sampling, do not achieve a desirable level of accuracy
+\citep{pajunen2021solution}.
+
+Therefore, the advantages of PLPs cannot be explored while
+these major limitations for their scalability are not addressed.
+One possible solution for the logical inference problem is to
+use Knowledge Compilation (KC), a well-studied method for translating propositional
+logic formulae into tractable logical circuits \citep{Darwiche_2002}.
+This field of study has seen many advancements in the last decades,
+with theoretical results that show relations between different classes
+of circuits and their capability of encoding logical formulae
+for tractable inference depending on the type of queries that
+are to be answered \citep{Darwiche_2002}. For the probabilistic
+counterpart, Variational Inference (VI) methods using circuits or
+adapting Answer Set Enumeration in the order of Optimality (ASEO)
+to work with circuits are promising approaches to be studied in the
+future.
+
+\section{Objective of this Work}
+
+It is well known that learning PLP models
+is a difficult and slow task \citep{EITER2024104109,
+vlasselaer2016tp}. This is due to the fact that the logical
+constraints of PLPs must be taken into account during the
+computation of the gradients \citep{geh2023dpasp}, which can be
+a major bottleneck for the training process. This work aims to
+study the use of KC to address the computational bottleneck
+of probabilistic logical inference tasks within PLPs, with a
+specific focus on Probabilistic Answer Set Programming (PASP),
+a PLP language focused on expressing contradictory or vague
+knowledge. While the proposed techniques were tailored
+specifically for tractable probabilistic inference in PASP, they present a
+promising approach for general PLPs through the use of
+heuristics that leverage program structure or advancements
+in Non-Incremental compilation
+
+Although the literature for methods for compiling stratified
+PLP programs is vast, contemplating techniques such as
+$T_P$-compilation \citep{vlasselaer2016tp} and \textit{Loop
+Formulas} \citep{lee2003loop}, less is known about the more
+general class of PASP programs, where one has to take into
+account for both the logic and probabilistic semantics of the
+programs. In order to create tractable structures that
+correctly represent the desired semantics, one needs to impose
+constraints on the structure of the circuits \citep{wang2025}.
+The main approach for PASP in recent years of research
+consists of using a class of circuits called deterministic
+decomposable Negation Normal Form (\textsc{d-DNNF}) \citep{EITER2024104109,
+totis2023smproblog}, using a procedure that is capable of
+compiling the program into a circuit, but at the cost of
+translating the program into a Conjunction Normal Form (CNF)
+formula, which involves the creation of auxiliary variables and
+clauses, which may lead to an exponential blow-up in the target
+representation, even for small programs \citep{EITER2024104109}.
+
+Therefore, a desirable approach for this problem would be to
+directly compile the program into a circuit, without the need
+to translate the program into a CNF formula. The
+possibility of using a bottom-up approach is what allows for the
+compilation of PASP directly into a circuit, as the program
+can be grounded (turned into a propositional formula) and then
+one can build the circuit from the ground up, using operations
+similar to logical $\land$ and $\lor$.
+
+% This cannot
+% be done when one considers a structure such as a
+% d-DNNF (or at least not in a straightforward way), as
+% few constraints are imposed on the structure of this class of
+% circuits. On the other hand, another well-known class of circuits
+% are OBDDs, which have been shown to be able to encode
+% logic programs with some success, despite not being as succinct
+% as d-DNNFs. The main advantages of OBDDs are their
+% canonical form, which allows for a unique representation of a
+% Boolean function (given an ordering of the variables), and their
+% operations, which allow a \textit{bottom-up} approach to the
+% construction of the circuit.
+
+% Given the goal of compiling PASP programs with a bottom-up
+% approach, a natural question that arises is whether there is a
+% structure capable of performing operations similar to the ones
+% used in OBDDs, but that is capable of encoding Boolean
+% formulas in a more succinct way. The answer to this question
+% was developed by \citep{darwiche2011sdd}, called
+%, a class of circuits that has tighter size bounds
+%in relation to OBDDs, and that has been shown to be able
+
+Sentential Decision Diagrams (SDDs) have been shown to be able
+to compile (stratified) PLP programs in a bottom-up manner
+with great success \citep{vlasselaer2016tp}. Even though
+theoretical results have shown that \textsc{d-DNNF} are a more
+succinct class of target language than SDD, i.e. they
+can represent the same Boolean functions with a more
+compact representation, the lack of constraints in their
+structure does not allow for the same direct bottom-up compilation
+approach as SDD. Hence, the trade-off of using a less
+succinct target representation, as SDDs, has been shown
+to be a more effective approach than the costly translation
+to CNF that many top-down approaches (usually via
+\textsc{d-DNNF}) suffer from \citep{vlasselaer2014compiling}.
+
+Thus, the main goal of this work is to study the use of KC
+for PASP programs for tractable inference under its more
+common semantics (\textsc{MaxEnt} and \textit{Credal}).
+
+% Moreover, this
+% work studies the bottom-up compilation methods for PASP programs using
+% SDDs within the framework of 2AMC, which is a generalization of
+% the AMC problem, which generalizes the well-known WMC problem.
+% While compilation methods for PASP programs are a topic in its infancy and a
+% bottom-up approach has not been described in the literature, the
+% formal definition of the computation of the \textit{Credal}
+% semantics under the Stable Model is also a novel problem, given
+% that only the \textsc{MaxEnt} semantics (under the Stable Model
+% semantics) has been described as a 2AMC task
+% \citep{kiesel2022efficient}.

@@ -1,0 +1,60 @@
+% Appendix Circuits and Knowledge Compilation
+
+\chapter{Appendix Circuits and Knowledge Compilation}
+
+\label{ap:circuits}
+
+%---------------------------------------------------------------
+
+Through years of theoretical and experimental studies, the last 
+decades have proven that \acl{KC} is a key focus of research for
+dealing with computational intractability of general 
+propositional reasoning \citep{Darwiche_2002}. This tractability
+is achieved via two steps:
+
+\begin{enumerate}
+    \item First, the \textit{off-line} compilation of a 
+        (logical) propositional theory into a specified
+        language, such as \ac{NNF} (that will be discussed in 
+        more detail in the next sections);
+    \item Then the \textit{on-line} answering of large number
+        of logical queries, in polynomial time w.r.t. the size
+        of compiled theory.
+\end{enumerate}
+
+The motivation of this procedure is to push as much of the 
+computational overhead into the \textit{off-line} phase; which
+is amortized over the \textit{on-line} phase, due to the 
+polynomial complexity of the queries \citep{Darwiche_2002}. 
+Therefore, the challenge of this type of this area itself is not
+so different of others fields in Artificial Intelligence: the 
+Min-Max nature of trying to solve or approximate problems that
+are known to be hard (\ac{NP}). 
+
+In the specific case of \acl{KC}, the Min-Max relation is due to
+the fact that we want to minimize the overhead of the compiling
+a theory, which is a step know to be hard, otherwise it would be
+possible to solve \ac{SAT} in polynomial time (an hypothesis 
+that we find to be untrue, on the premises of this thesis). As
+we will see, minimizing the overhead of this first step will not
+necessarily produce a circuit that allows fast answers to the 
+respective set o queries. Another possible scenario is that the 
+queries are indeed able to be answered in polynomial time w.r.t. 
+the size of the compilation's product, but this product has an 
+exponential size, due to not exploring intrinsic logical 
+relations of the theory.
+
+One can not claim, at least in the state of the research that
+is found today, that there is a language that minimizes the 
+compilation overhead and enables fast answering of queries for 
+any arbitrary query. Among other reasons, we have that the 
+transitional phase nature of logical problems, such as \ac{SAT}
+\citep{gent1994sat}, renders this \textit{No free lunch} 
+\citep{Wolpert_No_Free_Lunch} characteristic to arbitrary 
+optimization of general theories. On the other hand, better 
+algorithms and language classes are extensively developed, 
+especially when we reduce the scope of the target theories. 
+Reducing the class of studied theories also makes it possible 
+to narrow the set of languages that are fit for the compilation,
+and enables us to determine which of them consistently perform
+better within the specified context.

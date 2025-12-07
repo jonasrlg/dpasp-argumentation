@@ -1,0 +1,23 @@
+graph "" {
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    or ;
+    or [label="or"] ;
+    or -- and1 ;
+    and1 [label="and"] ;
+    and1 -- x ;
+    x [label="X"] ;
+    and1 -- alpha ;
+    alpha [label="&#945;"] ;
+    or -- and2 ;
+    and2 [label="and"] ;
+    and2 -- notx ;
+    notx [label="&#172; X"] ;
+    and2 -- beta ;
+    beta [label="&#946;"] ;
+
+    { rank=same ; and1 ; and2 }
+    { rank=same ; x ; alpha ; notx ; beta }
+}

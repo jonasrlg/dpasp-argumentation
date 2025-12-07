@@ -1,0 +1,36 @@
+graph "" {
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    or ;
+    or [label="or"] ;
+    or -- and1 ;
+    and1 [label="and"] ;
+    and1 -- x ;
+    x [label="X"] ;
+    and1 -- y ;
+    y [label="Y"] ;
+    and1 -- z ;
+    z [label="Z"] ;
+    or -- and2 ;
+    and2 [label="and"] ;
+    and2 -- notx ;
+    notx [label="&#172; X"] ;
+    and2 -- y ;
+    and2 -- z ;
+    or -- and3 ;
+    and3 [label="and"] ;
+    and3 -- notx ;
+    and3 -- noty ;
+    noty [label="&#172; Y"] ;
+    and3 -- z ;
+    or -- and4 ;
+    and4 [label="and"] ;
+    and4 -- notx ;
+    and4 -- noty ;
+    and4 -- notz ;
+    notz [label="&#172; Z"] ;
+    { rank=same ; and1 ; and2 ; and3 ; and4 }
+    { rank=same ; x ; y ; z ; notx ; noty ; notz }
+}
