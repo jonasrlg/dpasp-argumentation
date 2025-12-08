@@ -5,86 +5,75 @@
 % As palavras-chave são obrigatórias, em português e em inglês, e devem ser
 % definidas antes do resumo/abstract. Acrescente quantas forem necessárias.
 \palavraschave{Programação Lógico Probabilística, Compilação de Conhecimento,
-Circuito Probabilísticos}
+Circuito Probabilísticos, Mineração de Argumentos}
 
 \keywords{Probabilistic Logic Programming, Knowledge Compilation,
-Probabilistic Circuits}
+Probabilistic Circuits, Argument Mining}
 
 % O resumo é obrigatório, em português e inglês. Estes comandos também
 % geram automaticamente a referência para o próprio documento, conforme
 % as normas sugeridas da USP.
 \abstract{
-Advances in Probabilistic Logic Programming (PLP) and Probabilistic Inference (PI) have
-demonstrated that Knowledge Compilation (KC) techniques, which compile probabilistic
-logic programs into Answer Set Programs (ASP), are essential for
-fast and exact inference. Despite the close relationship between Circuit Theory
-and the complexity of logical inference, it is possible to exploit the structure
-of PLPs to construct more succinct circuits that can efficiently answer
-probabilistic queries.
+Argumentation mining is a complex task that has been approached more
+recently using purely connectionist methods. These methods aim to extract
+arguments from text data and represent them in a structured format. However,
+these methods often lack the ability to handle uncertainty and probabilistic
+reasoning, and usually require large amounts of labeled data for training,
+which often are not available in many real-world scenarios.
 
-Although previous research has shown that the compilation of stratified programs
-can be achieved using various techniques, such as $T_P$-consequence or Loop
-Formulas, little has been explored in the context of PASP compilation,
-apart from top-down compilation approaches that translate the program into a
-Conjunction Normal Form (CNF) and subsequently apply knowledge compilation techniques.
-Decomposable Negation Normal Form (DNNF) compilation-based methods have also been
-investigated.
+In order to address these limitations, frameworks for modeling and reasoning
+about arguments have been developed. These frameworks model the problem via
+a Neuro-Symbolic approach, either using Integer Programming or Probabilistic
+Logic Programming (PLP). While Integer Programming is a well-known mathematical
+optimization technique that can be used to model and solve complex
+decision-making problems, the integration of such methods to constrain learning
+and inference is a challenging task. On the other hand, Probabilistic Logic
+Programming stands itself as a powerful tool with declarative semantics and
+more ``readable'' syntax for non-experts.
 
-Drawing inspiration from successful works on the compilation of stratified
-PLP languages, this research aims to leverage the tractability and bottom-up
-nature of a special class of Arithmetic Circuits (AC), called Probabilistic
-Sentential Decision Diagrams (PSDDs), to compile PASP programs into PSDDs under the
-\textit{Max Entropy} and \textit{Credal} semantics. Furthermore, this bottom-up
-approach enables structural optimizations through modifications to the variable
-tree that governs the structure of the circuits, resulting in more succinct
-representations.
-
-Finally, PSDDs are capable of performing exact inference in polynomial time and
-support numerous algorithms for learning and regularization, specifically designed
-for use in Probabilistic Circuits (PCs). This further underscores the potential of
-PSDDs as a tractable representation for PLPs and highlights the need to explore
-efficient heuristics for dynamically modifying the variable tree structure when
-compilingPASP programs into PSDDs.
+As of the time of writing, current PLP frameworks for modeling Argumentation
+Mining focused on using stratified programs, which largely restrict the
+expressiveness of the different argumentation problems one may desire to
+represent. Thus, we propose to model this problem using Probabilistic Answer
+Set Programming (PASP), a framework that combines the expressiveness of ASP
+with the probabilistic reasoning capabilities of PLP. Furthermore, in order
+to be able to use this PASP framework for scalable Neuro-Symbolic learning,
+we explore different state-of-the-art Knowledge Compilation (KC) techniques
+of the language, which are able to encode PASP programs into circuits that
+can be encoded as computational graphs in a variety of autodifferentiable
+frameworks, such as PyTorch or Jax.
 }
 
 \resumo{
-Avanços em Programação Lógica Probabilística e Inferência Probabilística
-demonstraram que técnicas de Compilação de Conhecimento, as quais compilam
-programas lógicos probabilísticos em Programas de Conjunto de Respostas,
-são essenciais para inferência rápida e exata. Apesar da estreita relação
-entre a Teoria de Circuitos e a complexidade da inferência lógica, é possível
-explorar a estrutura dos Programas Lógicos Probabilísticos para construir
-circuitos mais concisos que podem responder eficientemente a consultas
-probabilísticas.
+A mineração de argumentação é uma tarefa complexa que tem sido abordada mais
+recentemente utilizando métodos puramente conexionistas. Esses métodos têm como
+objetivo extrair argumentos de dados textuais e representá-los em um formato
+estruturado. No entanto, esses métodos frequentemente carecem da capacidade de
+lidar com incertezas e raciocínio probabilístico, além de geralmente exigirem
+grandes quantidades de dados rotulados para treinamento, os quais muitas vezes
+não estão disponíveis em muitos cenários do mundo real.
 
-Embora pesquisas anteriores tenham mostrado que a compilação de programas
-estratificados pode ser alcançada usando várias técnicas, como a
-consequência do operador $T_P$ ou \textit{Loop Formulas}, pouco foi
-explorado no contexto da compilação de Programas de Conjunto de Respostas
-Probabilísticos, à parte de abordagens de compilação top-down (de cima
-para baixo) que traduzem o programa em uma Forma Normal Conjuntiva e
-subsequentemente aplicam técnicas de compilação de conhecimento. Métodos
-baseados na compilação para Forma Normal Negativa Decomponível também
-foram investigados.
+Para lidar com essas limitações, foram desenvolvidos frameworks para modelar e
+realizar raciocínio sobre argumentos. Esses frameworks modelam o problema por
+meio de uma abordagem Neuro-Simbólica, utilizando Programação Inteira ou
+Programação Lógica Probabilística (PLP). Enquanto a Programação Inteira é uma
+técnica de otimização matemática bem conhecida que pode ser usada para modelar
+e resolver problemas complexos de tomada de decisão, a integração de tais
+métodos para restringir aprendizado e inferência é uma tarefa desafiadora. Por
+outro lado, a Programação Lógica Probabilística se destaca como uma ferramenta
+poderosa com semântica declarativa e uma sintaxe mais ``legível'' para não
+especialistas.
 
-Inspirada em trabalhos bem-sucedidos sobre a compilação de linguagens de
-Programação Lógica Probabilística estratificada, esta pesquisa visa
-alavancar a tratabilidade e a natureza bottom-up (de baixo para cima) de
-uma classe especial de Circuitos Aritméticos, chamados Diagramas de
-Decisão Sentencial Probabilísticos, para compilar Programas de Conjunto
-de Respostas Probabilísticos nestes diagramas sob a semântica de
-Entropia Máxima e Credal. Além disso, essa abordagem bottom-up permite
-otimizações estruturais por meio de modificações na árvore de variáveis
-que governa a estrutura dos circuitos, resultando em representações mais
-concisas.
-
-Finalmente, os Diagramas de Decisão Sentencial Probabilísticos são capazes
-de realizar inferência exata em tempo polinomial e suportam inúmeros
-algoritmos para aprendizado e regularização, especificamente projetados
-para uso em Circuitos Probabilísticos. Isso reforça ainda mais o potencial
-dos Diagramas de Decisão Sentencial Probabilísticos como uma representação
-tratável para Programação Lógica Probabilística e destaca a necessidade de
-explorar heurísticas eficientes para modificar dinamicamente a estrutura
-da árvore de variáveis ao compilar Programas de Conjunto de Respostas
-Probabilísticos nos Diagramas de Decisão Sentencial Probabilísticos.
+No momento da redação deste trabalho, os frameworks atuais de PLP para modelar
+a Mineração de Argumentação focaram no uso de programas estratificados, o que
+restringe amplamente a expressividade dos diferentes problemas de argumentação
+que se deseja representar. Assim, propomos modelar esse problema utilizando a
+Programação Lógica com Conjuntos de Respostas Probabilística (PASP), um
+framework que combina a expressividade da ASP com as capacidades de raciocínio
+probabilístico da PLP. Além disso, para ser capaz de usar esse framework PASP
+para aprendizado Neuro-Simbólico escalável, exploramos diferentes técnicas
+modernas de Compilação de Conhecimento (KC) da linguagem, que são capazes de
+codificar programas PASP em circuitos que podem ser representados como grafos
+computacionais em uma variedade de frameworks autodiferenciáveis, como PyTorch
+ou Jax.
 }
