@@ -1,0 +1,392 @@
+% Appendix Answer Set Programming
+
+\chapter{Appendix Answer Set Programming}
+\label{ch:asp}
+
+The study of Knowledge Represenation (KR) aspires to find compromises between
+expressiveness and efficiency; so that one of the motivating
+reasons for the research in this area is the well-known fact
+that calculating entailments of arbitrary first-order logical
+Knowledge Base (KB) can be intractable \citep{levesque1986knowledge}. Even
+when considering the usage of heuristics and refinements, the
+Resolution procedure can still be exponential
+\citep{levesque1986knowledge}.
+
+Due to this intrinsic complexity of First-Order Logic (FOL), the main
+alternative to Knowledge Base representation is the use of less
+expressible representations, such as propositional logic. This
+idea of restricting the expressiveness of a logic formalism in
+order to obtain a more efficient reasoning procedure is a
+fundamental trade-off that characterizes the Knowledge Representation research
+\citep{levesque1987expressiveness}.
+
+In the previous appendix \ref{ch:sat}, we talked about the
+complexity class of SAT-like encompasses several hard
+computational problems, with focus on logical ones. A not so
+distant problem, from a logical standpoint, is the Resolution
+procedure, which used to calculate entailments of any
+first-order logical KB \citep{brachman2004knowledge}. In
+other words, Resolution is an inference procedure that leads to
+a refutation-complete theorem-proving technique for
+Propositional Logic and FOL.
+
+As one could imagine, by its relationship with SAT, in its
+most general form, Resolution ran into serious computational
+difficulties \citep{brachman2004knowledge}. Although refinements
+to Resolution may lead to more efficient routines, the
+complexity of this problem is intrinsically high due to its
+nature \citep{brachman2004knowledge}. This is a consequence
+of the fundamental computational intractability of first-order
+entailment.
+
+Therefore, in this chapter, we will explore the idea of limiting
+ourselves to only a certain interesting subset of FOL,
+where the Resolution procedure becomes much more manageable. We
+will also see that from a representation standpoint, that the
+subset in question, Answer Set Programming (ASP) is still sufficiently expressive
+for many real-world applications purposes, such as Argumentation
+\citep{toni2011argumentation}.
+%----------------------------------------------------------------------------------------
+\section{Foundations of Logic Programming} \label{sec:lp}
+
+\subsection{Definite Logic Programs}
+
+Before diving on the semantics of Probabilistic Answer Set Programming (PASP), it is important to
+understand less expressive formalisms, such as \textit{definite}
+and \textit{propositional} programs. These formalisms are not only
+the basis where Answer Set Programming (ASP) is built upon, but also hint at the
+underlying complexity of the problems that Answer Set Programming (ASP) can solve
+and the efficiency of the algorithms that can be used in this
+context. Thus, we start by defining the simplest form of
+Logic Programming (LP), called \textit{definite} (or \textit{positive})
+programs:
+
+\begin{definition}[Definite Logic Programs]
+    A definite logic program $P$ is a finite set of clauses
+    (rules) in the form
+    \begin{minted}{prolog}
+        a :- b1, ..., bM.
+    \end{minted}
+    where $a, b_1, \ldots, b_m$ are atoms of a function-free
+    FOL $L$; and this rule can be seen as material
+    implication restricted to Horn clauses, where
+    \mintinline{prolog}{a :- b1, ..., bM} is read as $B \supset
+    A$ or $B \rightarrow A$ \citep{eiter2009answer}. The atom
+    $a$ is called the \textit{head} of the rule, while $b_1,
+    \ldots , b_m$ are called the rule’s \textit{body}. When a
+    rule has an empty body, it is called a fact and can be
+    shortened as $a$.
+
+    The following program is an example of a definite program:
+    \begin{minted}{prolog}
+        happy(turing) :- friends(turing, vonNeumann).
+    \end{minted}
+
+    Programs without variables, like the one above, are called
+    \textit{propositional} programs.
+\end{definition}
+
+We could skip the definition of propositional programs, if we
+were not interested in the complexity of this problem, that is
+not only $P-complete$, but can be solved in linear time
+(testing satisfiability of propositional (Horn) formulas)
+\citep{dowling1984linear}.
+
+\subsection{Herbrand Universe, Base and Interpretation}
+
+A natural question that arises after the definition of this new
+class of program is about its complexity. This answer largely
+depends on the type of normal program that we are dealing with.
+In search of a more formal explanation, we have to introduce
+more concepts to capture a class of programs that we are
+comfortable between the trade-off of expressiveness and
+efficiency. We do this by firstly defining the concept of
+\textit{Herbrand Universe} and \textit{Base}:
+
+\begin{definition}[Herbrand Universe]
+    The \textit{Herbrand Universe} $HU(P)$ of a logic program $P$
+    is the set of all terms that can be formed from constants
+    and functions in $P$ (w.r.t. a predefined vocabulary $L$).
+    Moreover, the \textit{Hebrand Base} $HB(P)$ of $P$ is the set
+    of all ground atoms that can be formed from terms and
+    predicates occurring $HU(P)$. Finally, ta \textit{Herbrand
+    Interpretation} is a subset of $HB(P)$, an interpretation
+    $I$ (a set denoting ground \textit{truths}) over $HU(P)$.
+\end{definition}
+
+\begin{example}
+    Consider the following logic program $P$
+    \citep{eiter2009answer}:
+    \begin{minted}{prolog}
+        h(0, 0).
+        t(a, b, r).
+        p(0, 0, b).
+        p(f(X), Y, Z) :- p(X, Y, Z'), h(X, Y), t(Z, Z', r).
+        h(f(X), f(Y)) :- p(X, Y, Z'), h(X, Y), t(Z, Z', r).
+    \end{minted}
+    Then, the Herbrand Universe $HU(P)$ is the union of the set
+    containing all constants of $P$, $\{0, a, b, r\}$, and the
+    set of terms that can be formed from these constants
+    $\{f(0), f(a), f(b), f(r), f(f(0)), f(f(a)), f(f(b)),
+    f(f(r)), \ldots\}$. Whereas, the Herbrand Base, $HB(P)$ is
+    given by the set of all ground atoms assertions, $\{p(0, 0,
+    0), p(a, a, a), \ldots, h(0, 0), \ldots, t(0, 0, 0), t(a, a,
+    a), \ldots\}$.
+
+    Finally, we list a few Herbrand Interpretations over
+    $HU(P)$:
+
+    \begin{itemize}
+        \item $I_1 = \emptyset$;
+        \item $I_2 = HB(P)$;
+        \item $I_3 = \{h(0, 0), t(a, b, r), p(0, 0, b)\}$.
+    \end{itemize}
+    Note that not all interpretations are consistent with the
+    program $P$. For instance, the interpretation $I_1$ is
+    contradictory, because it contains does not contain any
+    of the facts of $P$.
+\end{example}
+
+\subsection{Grounding of a Logic Program}
+
+With the notion of Herbrand Universe and Base, we can now have
+a moral formal definition of \textit{grounding}
+\citep{eiter2009answer}:
+
+\begin{definition}[Grounding]
+    We define a ground instance of a clause $C$, of a logic
+    program  $P$, as any clause $C'$ obtained from $C$ by
+    applying a substitution
+    \begin{displaymath}
+        \theta: Var(C) \rightarrow HU(P),
+    \end{displaymath}
+    where $Var(C) \in \mathcal{V}(P)$ is the set of variables
+    in $C$. Moreover, the grounding of a program $P$ is the set
+    of all possible ground instances of the clauses in $P$ and
+    is denoted by $ground(P) = \bigcup_{C \in P} ground(C)$ (the
+    union of all ground instances for all the clauses in $P$).
+\end{definition}
+
+\subsection{Interpreation of a Logic Program}
+
+As we are already formalizing the concepts like grounding, the
+Interpretation of a logic program is also a concept that needs
+more attention. Thus, follows its definition:
+
+\begin{definition}[Interpretation]
+    The interpretation $I$ of a logic program $P$ is a model of
+    $P$ that is compatible with the assertions in $P$. That is,
+    $I$ is a model of
+
+   \begin{itemize}
+        \item A ground clause $C =$ \mintinline{prolog}{a :- b1, ..., bM, not c1, ..., cN},
+        denoted $I \models C$, if either $\Set{a, c_1, \ldots,
+        c_N} \cap I \ne \emptyset$ or $\Set{b_1, \ldots, b_M}
+        \not \subseteq I$;
+        \item A clause $C$, denoted $I \models C$, if $I \models
+        C'$ for every $C' \in ground(C)$;
+        \item A program $P$, denoted $I \models P$, if
+        $I \models C$ for every clause $C \in P$.
+   \end{itemize}
+   That is: an interpretation $I$ is a model of a program $P$ if
+   it is compatible with all the ground instances of the clauses
+   of $P$.
+
+   We call a model $I$ of a program $P$ a \textit{minimal model},
+   if there is no other model $J$ of $P$ such that $J \subset
+   I$. Although, Normal logic programs can have multiple minimal models
+   for a program, it is true that Definite Logic Programs only
+   have one minimal model \citep{eiter2009answer}.
+\end{definition}
+
+\subsection{Loop Formulas}
+
+\begin{definition}[Loops]
+    Let $P$ be a normal logic program. Any nonempty subset $L$
+    of the atoms of $P$ is called a \textit{loop} if for any two
+    atoms $p,q$ in $L$, there is a path in the dependency graph
+    of $P$ from $p$ to $q$ of length greater than zero.
+
+    We also associate two sets of rules with a loop $L$:
+    \begin{itemize}
+        \item The set of rules $R^+(L,P)$ contains rules of $P$
+        whose heads and bodies are in $L$; and
+        \item The set of rules $R_L^-(L,P)$ contains rules about
+        atoms in $L$ that are out of the loop $L$.
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Loop Formulas]
+    Let $P$ be a normal logic program and $L$ be a loop of $P$.
+    Then, the \textit{loop formula} $LF(L,P)$ is the following
+    implication:
+    \begin{displaymath}
+        \bigvee_{p \in L} \neg p \subset \neg \bigwedge_{r
+        \in R-(L,P)} \mathrm{body}(r),
+    \end{displaymath}
+    where $\mathrm{body}(r)$ is the body of the rule $r$.
+\end{definition}
+
+The main idea behind loop formulas is that they can be used to
+transform logic programs under stable model semantics to
+propositional theories. This is particularly useful when these
+propositional theories are fed into SAT solvers to compute
+stable models. The entire process of translating a logic program
+by this approach includes: using Clark's completion to create a
+propositional theory and augment it by using additional loop
+formulas, that guarantees that this theory admits only stable
+models \citep{lin2004assat}. One problem with this approach is
+that the number of loop formulas must be controlled in some
+way, because there can be an exponential number of loop formulas
+for a given program \citep{eiter2009answer}.
+
+\section{Answer Set Programming} \label{sec:asp}
+
+Finally, after defining the main semantics for logic programs
+that include negation, we introduce the concept of ASP,
+an extension of normal logic programming that allows for the use
+of: integrity constraints, strong negation, disjunctive rules,
+and choice rules \citep{eiter2009answer, maua2020complexity}.
+
+\subsection{Extended Logic Programs}
+
+We start this ASP definition by first introducing the
+concept of Extended Logic Programs (ELP) and Extended Disjunctive
+Logic Programs (EDLP), programs that use the three
+extensions defined above.
+
+\subsubsection{Integrity Constraints}
+
+Integrity constraints are a way of checking admissibility of
+models, by adding rules that must be satisfied by all models.
+These constraints can be written as a rule of the form
+
+\begin{minted}{prolog}
+    :- b1, ..., bM, not c1, ..., not cN.
+\end{minted}
+
+But, this rules without heads can also be written with heads
+when using auxiliary predicates, such as
+
+\begin{minted}{prolog}
+    falsity :- b1, ..., bM, not falsity, not c1, ..., not cN,
+\end{minted}
+
+where the auxiliary $falsity$ is a fresh propositional atom
+\citep{eiter2009answer}.
+
+\subsubsection{Strong Negation}
+
+Strong negation is not a necessity for the definition of
+ELP, because one can emulate this concept by using
+integration constraints and (default, also called \textit{weak})
+negation. But, the introduction of this concept is at least
+enlightening, because it allows to encode knowledge that
+something is known to be false.
+
+Usually, this notion of knowing that $a$ is false is denoted
+by $\neg a$. But, in the context of ASP, the common
+notation is $- a$.
+
+\subsubsection{Extended Logic Programs}
+
+By combining normal logic programs with integrity constraints
+and strong negation, we are capable of defining ELP:
+
+\begin{definition}[Extended Logic Programs]
+    An extended logic program $P$ is a finite set of rules of
+    the form:
+    \begin{minted}{prolog}
+        a :- b1, ..., bM, not c1, ..., not cN,
+    \end{minted}
+    where $M, N \geq 0$; $a, b_i, c_i$ are atoms or
+    \textit{strongly negated} atoms of a FOL.
+\end{definition}
+
+Since we showed how one could represent integrity constraints by
+using auxiliary predicates, and that strong negation can be
+described by using default negation in combination with
+integration constraints, there is no need to define a new
+semantic for this type of logic programs.
+
+The only main ``difference'' is given by the fact that stable
+models of ELPs are called \textbf{\textit{answer sets}}.
+
+\subsubsection{Disjunctive Logic Programs}
+
+The last extension that we define for normal logic programs is:
+the addition of disjunctions on the head of rules:
+\begin{definition}[Extended Disjunctive Logic Programs]
+    An extended disjunctive logic program $P$ is a finite set
+    of rules of the form:
+    \begin{minted}{prolog}
+        a1 ; ... ; aK :- b1, ..., bM, not c1, ..., not cN,
+    \end{minted}
+    where $K, M, N \geq 0$; $a_i, b_i, c_i$ are atoms or
+    \textit{strongly negated} atoms of a FOL; and the
+    symbol $;$ denotes disjunction (similar to how commas
+    denote conjunctions).
+\end{definition}
+
+The semantics for an EDLP can be defined similarly to the
+ones for an ELP or normal logic program, with two main
+difference: instead of choosing a stable model $M$ of $P$ (i.e.,
+$M$ being the least model of the reduct $P^M$), we define the
+\textit{answer sets} $M$ of $P$ as the \textit{minimal model} of
+the reduct $P^M$ (since $P^M$ might have multiple minimal
+models); and there is the need to adjust the completion to suit
+heads with disjunctions. Completion of Disjunctive Logic
+Programs, as defined by \cite{alviano2016completion}, is a
+generalization of Clark's completion, where one has to consider
+
+Finally, we define Intepretations for EDLPs, that unifies
+different types of extensions that lead from
+\citep{wielemaker2012swi} to the development of Answer Set Programming.
+
+\begin{definition}[Interpretation (of an EDLP)]
+    Let $P$ be an EDLP. An interpretation $I$ is a model
+    of:
+    \begin{enumerate}
+        \item A ground clause $C =$ \mintinline{prolog}{a1; ...; aK :- b1, ..., bM, not c1, ..., cN},
+        denoted $I \models C$, if either $\Set{a_1, \ldots, a_K,
+        c_1, \ldots, c_N} \cap I \ne \emptyset$ or $\Set{b_1,
+        \ldots b_M} \not \subseteq I$;
+        \item A clause $C$, denoted $I \models C$, if $I \models
+        C$ for every $C' \in ground(C)$; and
+        \item A program $P$, denoted $I \models P$, if $I
+        \models C$ for every clause $C \in P$.
+    \end{enumerate}
+\end{definition}
+
+\subsection{Cardinality Constraints}
+
+The last extension that characterizes Answer Set Programming is called
+\textit{cardinality constraint}, which are constructs of the
+form: \mintinline{prolog}{L \{l1, ..., ln \} U}, that are
+satisfied whenever the number of satisfied literals $l_i$ is
+between the integral bounds $L$ and $U$, inclusive
+\citep{syrjanen2001smodels}. As Syrjänen and Niemelä described,
+a cardinality constraint in a rule head imposes a
+non-deterministic choice over the literals in it when the rule
+body is satisfied.
+
+\subsubsection{Choice Rules}
+
+An special case of cardinality constraints are \textit{choice
+rules}: rules where the head is enclosed in brackets and
+represent the idea that the head can be included in a stable
+model only if the body holds; but it can be left out, too
+\citep{syrjanen2001smodels}. This type of rule can be expressed
+through normal rules by introducing a new atom. For example,
+
+\begin{example}
+    The following program $P$
+    \begin{minted}{prolog}
+        {a} :- b, not c.
+    \end{minted}
+    is equivalent to the Normal logic program $P'$:
+    \begin{minted}{prolog}
+        a :- not aa, b, not c.
+        aa:- not a.
+    \end{minted}
+\end{example}

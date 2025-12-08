@@ -1,0 +1,333 @@
+% Appendix Sat
+
+\chapter{Appendix Satisfiability and Proof Theory}
+
+\label{ch:sat}
+
+% %---------------------------------------------------------------
+
+Logic concerns two main interdefinable ideas:
+\textit{consistency} and \textit{validity} \citep{franco2009history}.
+Moreover, this strongly
+interconnected relationship can be described either
+syntactically or semantically, where the former approach
+results in definitions related to \textit{proof theory}; and
+the latter one to \textit{model theory}.
+
+When considering the first approach, it is necessary to take
+into consideration that the \textit{syntax} is restricted to
+definitions that refer to the syntactic form of the sentences
+in question, the grammatical structure of the language. For
+\textit{proofs} to be carried out, it is necessary to define
+an axiom system, with a set of axioms and inference rules that
+allows the derivation of theorems, where \textit{derivability}
+is the syntatic notion of \textit{validity}
+\citep{franco2009history}. Similarly, the notion of
+\textit{consistency} under a syntactic approach is defined as
+the impossibility of deriving a contradiction from a set of
+related sentences \citep{franco2009history}. Since,
+\textit{consistency} is defined with respect to
+\textit{derivability}, and the latter is defined entirely
+syntactically, the notion of both \textit{consistency} and
+\textit{validity} are also syntactic.
+
+
+On the other hand, a semantic approach, that gives rise to
+\textit{model theory}, is concerned with the concept of
+\textit{truth}, with respect to the interpretation of some
+algebraic structure, usually referred to as \textit{the world},
+where the sentences are interpreted as \textit{true} or
+\textit{false} via a well-defined function
+\citep{franco2009history}. Similarly to the syntatic approach,
+both the semantic versions of \textit{validity} and
+\textit{consistency} are defined under the same concept, this one
+being the concept of \textit{structure}. In \textit{model theory},
+the \textit{validity} ideia is also called \textit{validity},
+where an argument is valid if, whenever the premises are true,
+so is the conclusion. As for the semantic version of the
+\textit{consistency} concept, on the other hand, it is called
+\textit{satistiability}. A set of formulas is said to be
+\textit{satisfiable} if there is some structure in which all of
+its components are \textit{true}; if such structure does not
+exists, the set is said to be \textit{unsatisfiable}
+\citep{franco2009history}.
+
+Even though both the syntactic and semantic versions of
+\textit{validity} and \textit{consistency}, \textit{derivability}
+and \textit{consistency}, respectively, have vastly different
+definitions, the concepts from these two branches of logic are
+closely intertwined. For a \textit{complete} axiom system, it is
+true that the syntactic and semantic concepts match up so as to
+\textit{validity} and \textit{consistency} coincide exactly, and
+the same for \textit{derivability} and \textit{satisfiability}.
+
+A very explicit relationship between \textit{satistiability} and
+\textit{proof theory} resides on the next chapter about Answer
+Set Programming (ASP - Chapter\ref{ch:asp}), in which the need for efficient algorithms to
+solve \textit{satistiability} problems is crucial for the
+development of ASP solvers. Moreover, this intrinsic
+relationship between \textit{satisfiability} and many other
+Computer Science problems is also reflected by the work of
+Shannon, who paved the way for the connection between Logic and
+Circuits \citep{shannon1938symbolic}, which enabled advancements
+such as Binary Decision Diagrams (BDDs) \citep{akers1978binary, bryant1986graph}, that
+were thought to be (during the 80's and 90's) the best way to
+tackle real-world applications related to logical problems, such
+as SAT and \textit{model counting}
+\citep{akers1978binary, bryant1986graph}.
+
+This relation between SAT and Circuits Theory, despite being a
+well-studied subject, is also what motivates the development of
+this dissertation. Since the complexity relationships that
+carry over from  \textit{satistiability} deeply influence the
+complexity of developing efficient methods for solving
+Probabilistic Answer Set Programming (PASP)
+and other Probabilistic Logic Programming (PLP) problems; what makes the development of
+efficient algorithms both challenging and open to new research
+opportunities.
+
+% %---------------------------------------------------------------
+
+\section{Notation}
+
+We borrow definitions and notation from the work of \citep{arora2009computational}
+and \citep{kimmig2017algebraic}. Since this chapter is focused on logical
+SAT-like problems, we only introduce basic logic concepts, such as
+\textit{Boolean formulas}, CNFs and \textit{Logical Propositional
+Theories}.
+
+\begin{definition}[Boolean Formulas] A \textit{Boolean formula}
+    is the combination of \textit{Boolean variables}, that can
+    be either $\top$ or $\bot$, and logical operators, such as
+    $\land$ ($AND$), $\lor$ ($OR$), $\lnot$ ($NOT$, also denoted
+    by an overline) \citep{arora2009computational}.
+\end{definition}
+
+\begin{example}
+    For example, the formula $\phi$ defined by
+    \begin{displaymath}
+       \phi = (u_1 \land u_2) \lor \lnot (u_3 \land
+       \overline{u}_4)
+    \end{displaymath}
+    is a Boolean formula over variables $u_1, u_2, u_3, u_4$.
+    We denote by $\phi(a)$ the evaluation of $\phi$ over an
+    assignment $a$ of the variables in the formula.
+
+\end{example}
+
+\begin{definition}[Conjunctive Normal Form]
+    \label{def:cnf}
+    A Boolean formula over variables $u_1, \ldots u_n$ is in
+    CNF if it is a conjunction of clauses, where each
+    clause is a disjunction of literals, and a literal is either
+    a variable or its negation \citep{arora2009computational}.
+    Hence, a CNF is a Boolean formula of the form
+    \begin{displaymath}
+        \bigwedge_i \left ( \bigvee_j v_{ij} \right ),
+    \end{displaymath}
+
+    where each $v_{ij}$ is a literal over variables $u_1,
+    \ldots u_n$.
+\end{definition}
+
+\begin{example}
+   For example, the following formula is a 3CNF (a CNF where
+   each clause has at most 3 literals) over variables $u_1, u_2,
+   u_3, u_4$:
+    \begin{displaymath}
+        (u_1 \lor \overline{u}_2 \lor u_3) \land (u_2 \lor
+        \overline{u}_3 \lor u_4) \land (\overline{u}_1 \lor
+        u_3 \lor \overline{u}_4).
+    \end{displaymath}
+\end{example}
+
+\begin{definition}[Disjunctive Normal Form]
+    A Boolean formula over variables $u_1, \ldots u_n$ is in
+    DNF if it is a disjunction of clauses, where each
+    clause is a conjunction of literals. Hence, a DNF is a
+    Boolean formula of the form:
+    \begin{displaymath}
+        \bigvee_i \left ( \bigwedge_j v_{ij} \right ),
+    \end{displaymath}
+    where each $v_{ij}$ is a literal over variables $u_1,
+    \ldots u_n$.
+\end{definition}
+
+\begin{definition}[Logical Propositional Theory]
+    A \textit{Logical Theory} is set of logical sentences,
+    Boolean-valued formulas with no free variables. Hence, a
+    \textit{Propositional Theory} is Logical Theory where the
+    sentences are propositional formulas, i.e., formulas with
+    no quantifiers.
+\end{definition}
+
+%------------------------------------------------
+
+\section{Satisfiability}
+
+The SAT problem is a fundamental problem in both Artificial Intelligence and
+Theory of Computation. This importance is due
+not only by the logical nature of SAT, but also by the fact
+that all NP problems can be reduced to SAT in
+polynomial time, thus its NP-completeness \citep{Cook_1971,
+levin1973universal}. In this manner, the SAT problem is a
+natural candidate for encoding not only arbitrary a wide range
+of logical theories, but also for encoding any NP problem
+in general. Therefore, methods to solve SAT fast are of
+great interest.
+
+Later in this work, when we discuss probabilistic inferences related
+to Probabilistic Argumentation (via Probabilistic Answer Set Programming),
+we will see that being able to solve numerous logical queries in polynomial
+time is a desirable feature, in order to scale an argumentation mining
+problem over learning Neural Networks. Therefore, our goal
+will not be to solve SAT only once; the necessity of
+solving it many times creates the need to develop tractable
+methods for solving multiple queries.
+
+Thus, we begin this thesis with a formal definition of the
+SAT problem and its variations, such as Max-SAT and
+Sharp-SAT (\textsc{#SAT} - also known as SAT-Counting).
+
+\subsection{Satisfiability}
+
+The Boolean Satisfiability Problem is the problem of
+determining whether a given CNF is \textit{satisfiable},
+i.e., whether there is an assignment of $True$ or $False$ to the
+variables that makes the formula $True$
+\citep{arora2009computational}. If such an assignment does not
+exist, the formula is said to be \textit{unsatisfiable}.
+
+\begin{definition}[SAT - Satisfiability]
+    Let SAT be the language of all satisfiable CNFs.
+    Then, we say that for a CNF $\phi$, the SAT
+    problem is defined as
+
+    \begin{displaymath}
+        \text{SAT}(\phi) = \{ \phi \mid \phi \text{ is a
+        satisfiable propositional formula} \}.
+    \end{displaymath}
+
+\end{definition}
+
+For example, $(True, False, False, False)$ is an example of
+assignment that makes the 3CNF of definition \ref{def:cnf}
+satisfiable. On the other hand, the CNF $x \land
+\overline{x}$ is unsatisfiable, since it is a
+\textit{contradiction} (the opposite of a tautology).
+
+\subsection{MAX-SAT}
+
+The Max-SAT problem is the problem of finding an assignment
+that satisfies the maximum number of clauses in a given CNF
+\citep{KRENTEL1988490}.
+
+\begin{definition}[MAX-SAT]  Formally, let $\phi$ be a
+    CNF over variables $x_1, \ldots, x_n$. Then, the
+    Max-SAT problem is to find an assignment $a$ such that
+    \begin{argmaxi*}|l|
+        {a}{ \sum_{c \in C} [\!\![ c(a) ]\!\!] }
+        {}{}
+        \addConstraint{\phi(a) = \bigwedge_{c \in C} c(a)},
+    \end{argmaxi*}
+
+    where $c(a)$ is the evaluation of $c$ over the assignment
+    $a$, and $[\!\![c(a)]\!\!]$ is the Iverson bracket, which is
+    equal to $1$ if $c(a)$ is $True$, and $0$ otherwise.
+\end{definition}
+
+Sometimes, the Max-SAT problem refers to the weighted
+version of the problem, where each clause has a non-negative
+weight, and the goal is to maximize the sum of the weights
+of the satisfied clauses.
+
+\begin{definition}[Weighted MAX-SAT]
+    Formally, let $\phi$ be a CNF over variables $x_1,
+    \ldots, x_n$, and let $w: C \rightarrow \mathbb{R}^+$ be the
+    weight function over the clauses of $\phi$. Then, this
+    variant of the Max-SAT problem, called
+    \textit{Weighted} Max-SAT, is defined as the problem of
+    finding an assignment $a$ such that
+    \begin{argmaxi*}|l|
+        {a}{ \sum_{c \in C} w(c) \cdot [\!\![ c(a) ]\!\!] }
+        {}{}
+        \addConstraint{\phi(a) = \bigwedge_{c \in C} c(a)}.
+    \end{argmaxi*}
+\end{definition}
+
+An interesting difference between the SAT and Max-SAT
+is that the former is a decision problem, while the latter is an
+optimization problem. Another relation between them is that
+SAT is a special case of the Max-SAT, where it is
+possible to obtain a solution where the maximum number of
+possible clauses satisfied is the total number of clauses. Thus,
+there is a reduction from SAT to Max-SAT, which is
+polynomial in time. Moreover, because of this reduction, one can
+claim that the Max-SAT problem is NP-hard, since
+SAT is NP-complete.
+
+The reduction from Max-SAT to weighted Max-SAT is
+simple too: just set all weights to $1$ (or any other constant),
+and the problem is reduced to the unweighted version. Therefore,
+the weighted version of the problem is also NP-hard, as one
+would expect. Moreover, the Max-SAT problem is also
+OptP-complete (Optimization Polynomial Time), similar to the
+\textit{Traveling Salesman} and \textit{Knapsack} problems \citep{KRENTEL1988490}.
+
+\subsection{Sharp-SAT}
+
+Differently from the SAT and Max-SAT problems, the
+$\#SAT$ (or Sharp-SAT) problem is a counting problem, where
+the goal is to count the number of solutions of a given CNF
+has \citep{valiant1979189}. Therefore, one can see the
+Sharp-SAT problem closer to Levin studied problems
+\citep{levin1973universal} than Cook's \citep{Cook_1971}, in the
+sense that the goal is to retrieve a solution, because there
+will always be one. A way to perform this computation would be
+a search problem over \textbf{all} possible assignments over the
+variables of the CNF, and count the number of them that
+satisfy the formula. Note that this is different from search
+problems, where finding one solution solves the problem, and the
+search can be stopped.
+
+This relation between Sharp-SAT and SAT variations
+does not stop here. The Sharp-SAT is clearly NP-hard,
+since it is possible to reduce SAT to Sharp-SAT in
+polynomial time, because knowing the number of solutions of a
+CNF is equivalent to knowing whether it has at least one
+solution. Moreover, Sharp-SAT is a Sharp-P-complete
+problem (or $\#P\mathrm{-complete}$), which means that it is
+capable of reducing the set of the counting problems associated
+with the decision problems in the set NP.
+
+\begin{definition}[\#SAT]
+    Formally, let $\phi$ be a CNF over variables $x_1,
+    \ldots, x_n$. Then, the Sharp-SAT  problem is to find
+    the natural number $n$ such that
+    \begin{displaymath}
+        \#SAT(\phi) = | \{ a \in \{0,1\}^n \mid a \text{ is an
+        assignment of } \phi \}|.
+    \end{displaymath}
+\end{definition}
+
+Similar to the Max-SAT problem, there is a weighted version
+of the Sharp-SAT problem, called Weighted Model Counting (WMC), where a
+non-negative weight is associated to each assignment of values
+to variables \citep{chakraborty2015weighted}. The classical
+version of the problem, usually called Model Counting (MC), can be seen as
+a special case of the weighted version, where all weights are
+equal to $1$, and is sometimes referred to as \textit{unweighted
+model counting}.
+
+\begin{definition}[Weighted Model Counting]
+    The Weighted Model Counting problem is the problem of finding the sum of
+    the weights of all assignments that satisfy a given
+    CNF. Formally, let $\phi$ be a CNF over variables
+    $x_1, \ldots, x_n$, and let $w: \{0,1\}^n \rightarrow
+    \mathbb{R}^+$ be the weight function over the assignments of
+    the variables in $\phi$. Then, the WMC problem is
+    \begin{displaymath}
+        \text{WMC}(\phi) = \sum_{a \in \{0,1\}^n} w(a) \cdot
+        [\!\![ \phi(a) ]\!\!].
+    \end{displaymath}
+\end{definition}
