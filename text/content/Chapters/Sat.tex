@@ -96,7 +96,8 @@ SAT-like problems, we only introduce basic logic concepts, such as
 \textit{Boolean formulas}, CNFs and \textit{Logical Propositional
 Theories}.
 
-\begin{definition}[Boolean Formulas] A \textit{Boolean formula}
+\begin{definition}[Boolean Formulas]
+    A \textit{Boolean formula}
     is the combination of \textit{Boolean variables}, that can
     be either $\top$ or $\bot$, and logical operators, such as
     $\land$ ($AND$), $\lor$ ($OR$), $\lnot$ ($NOT$, also denoted
@@ -187,7 +188,7 @@ methods for solving multiple queries.
 
 Thus, we begin this thesis with a formal definition of the
 SAT problem and its variations, such as Max-SAT and
-Sharp-SAT (\textsc{#SAT} - also known as SAT-Counting).
+Sharp-SAT (\textsc{\#SAT} - also known as SAT-Counting).
 
 \subsection{Satisfiability}
 
@@ -222,18 +223,17 @@ The Max-SAT problem is the problem of finding an assignment
 that satisfies the maximum number of clauses in a given CNF
 \citep{KRENTEL1988490}.
 
-\begin{definition}[MAX-SAT]  Formally, let $\phi$ be a
+\begin{definition}[MAX-SAT]
+    Formally, let $\phi$ be a
     CNF over variables $x_1, \ldots, x_n$. Then, the
-    Max-SAT problem is to find an assignment $a$ such that
-    \begin{argmaxi*}|l|
-        {a}{ \sum_{c \in C} [\!\![ c(a) ]\!\!] }
-        {}{}
-        \addConstraint{\phi(a) = \bigwedge_{c \in C} c(a)},
-    \end{argmaxi*}
-
-    where $c(a)$ is the evaluation of $c$ over the assignment
-    $a$, and $[\!\![c(a)]\!\!]$ is the Iverson bracket, which is
-    equal to $1$ if $c(a)$ is $True$, and $0$ otherwise.
+    Max-SAT problem is to find an assignment $a$ that maximizes the
+    sum of the Iverson brackets of the clauses in $C$, such that:
+    \begin{displaymath}
+        \phi(a) = \bigwedge_{c \in C} c(a),
+    \end{displaymath}
+    where $c(a)$ is the evaluation of $c$ over the assignment $a$, and
+    $[\!\![c(a)]\!\!]$ is the Iverson bracket, which is equal to $1$ if $c(a)$
+    is $True$, and $0$ otherwise.
 \end{definition}
 
 Sometimes, the Max-SAT problem refers to the weighted
@@ -245,14 +245,16 @@ of the satisfied clauses.
     Formally, let $\phi$ be a CNF over variables $x_1,
     \ldots, x_n$, and let $w: C \rightarrow \mathbb{R}^+$ be the
     weight function over the clauses of $\phi$. Then, this
-    variant of the Max-SAT problem, called
-    \textit{Weighted} Max-SAT, is defined as the problem of
-    finding an assignment $a$ such that
-    \begin{argmaxi*}|l|
-        {a}{ \sum_{c \in C} w(c) \cdot [\!\![ c(a) ]\!\!] }
-        {}{}
-        \addConstraint{\phi(a) = \bigwedge_{c \in C} c(a)}.
-    \end{argmaxi*}
+    variant of the Max-SAT problem, called \textit{Weighted} Max-SAT, is defined
+    as the problem of finding an assignment $a$ such that it maximizes the
+    following:
+    \begin{displaymath}
+        \sum_{c \in C} w(c) \cdot [\!\![ c(a) ]\!\!],
+    \end{displaymath}
+    subject to the constraint that
+    \begin{displaymath}
+        \phi(a) = \bigwedge_{c \in C} c(a).
+    \end{displaymath}
 \end{definition}
 
 An interesting difference between the SAT and Max-SAT
