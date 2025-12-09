@@ -4,94 +4,69 @@
 
 \label{ch:introduction}
 
-Argumentation is a fundamental aspect of human communication, arising in
-contexts ranging from everyday discussions to formal debates and legal
-reasoning. The importance of argumentation extends beyond mere persuasion; it is
-central to critical thinking, decision-making, and the construction of
-knowledge. Hence, understading how arguments are structured, how they interact
-and how they can be evaluated is a key challenge for both social sciences and
-Artificial Intelligence (AI)
+Argumentation is a fundamental aspect of human communication, surfacing in
+contexts that range from informal discussions to legal reasoning. Beyond
+persuasion, argumentative exchanges support critical thinking, collective
+decision-making, and the construction of shared knowledge. Understanding how
+arguments are structured, how they interact, and how they can be evaluated is
+therefore a central challenge for both the social sciences and Artificial
+Intelligence (AI).
 
-An area of growing interest within AI is \emph{argumentation mining}, which
-seeks to automatically identify and extract argumentative structures from
-natural language texts \citep{stab2017parsing}. Therefore, this field can be
-greatly enhanced by Neuro-Symbolic AI techniques, that combine the strengths of
-symbolic reasoning and connectionist learning. More specifically, connectionist
-models excel at processing unstructured data, such as text, extracting
-argumentative components and their relations. On the other hand, symbolic
-reasoning provides a framework for robustly constraining and interpreting these
-components, either in inference or learning.
+Recent advances in argumentation mining attempt to automatically detect the
+building blocks of argumentative discourse (claims, premises, supports, and
+attacks) directly from text \citep{stab2017parsing}. The quality of these
+pipelines depends on coordinating several interdependent subtasks: deciding
+whether a span of text is argumentative, classifying its role, and predicting
+how it relates to the rest of the discourse. Errors in the early stages easily
+propagate to later ones, eroding the coherence of the recovered argumentative
+graph. Neuro-symbolic methods are especially attractive in this setting because
+they combine neural networks, which excel at processing unstructured language,
+with symbolic reasoning, which enforces global consistency and domain
+constraints.
 
-Core tasks in argumentation mining may include: separating argumentative from
-non-argumentative spans, classifying argument components, and predicting the
-support or attack relations between them. These tasks share tight interectios,
-where errors in earlier stages, such as claim identification, can easily
-propagate and degrade the coherence of the recovered  argumentative graph
-\citep{stab2017parsing}. By optimizing these tasks jointly within a structured
-framework, with global constraints, we can mitigate this error propagation and
-improve the system's overall performance.
+The foundational joint model of \citet{stab2017parsing} couples local
+classifiers with Integer Linear Programming (ILP) constraints that capture the
+shape of well-formed argumentative structures. ILP-based approaches improved
+consistency over pipeline baselines, yet they struggle to represent uncertainty
+and incur a combinatorial cost when the search space grows. Probabilistic Logic
+Programming (PLP) systems, such as ProbLog \citep{fierens2015}, mitigate these
+limitations by natively handling stochastic information while retaining the
+declarative and explainable nature of logic programs. Frameworks like
+DeepProbLog \citep{manhaeve2018deepproblog} and its application to argumentation
+mining \citep{cerveira2023argumentation} demonstrate how neural predictions can
+be wired into symbolic models that reason about argumentative structure.
 
-One of the main approaches for this task was proposed in \citep{stab2017parsing},
-where the authors introduce a joint model for argumentation mining based on
-Integer Linear Programming (ILP). Their model combines local classifiers for
-argument component identification and relation prediction with global constraints
-that enforce the well-formedness of the argumentative structure. This joint
-model demonstrates improved performance over pipeline approaches, highlighting
-the benefits of integrating local predictions with global reasoning. On the
-other hand, the ILP-based approach struggles to naturally express uncertainty
-in the predictions, and its reliance on discrete optimization can limit its
-scalability and flexibility.
+Extending this line of work, \textsc{smProbLog} adopts the stable model
+semantics of Answer Set Programming (ASP), unlocking the ability to represent
+negative cycles and other non-monotonic phenomena that occur in real-world
+argumentation \citep{totis2023smproblog}. Stable models are expressive enough
+to encode the bipolar argumentation frameworks we study in this thesis, but
+their probabilistic extensions quickly lead to intractable inference when
+treated naïvely.
 
-More recent approaches focused on leveraging Probabilistic Logic Programming
-(PLP) systems, such as ProbLog \citep{fierens2015}, to model argumentation
-mining. These approaches benefit from the declarative nature of PLP, allowing
-for more interpretable models that can naturally incorporate uncertainty and
-logical reasoning, without the need of expert knowledge to define complex ILP
-constraints. For instance, the framework proposed by \citep{cerveira2020joint}
-leverages DeepProbLog \citep{manhaeve2018deepproblog} to combine neural
-networks to handle the connectionist part of the task, with ProbLog to model the
-symbolic reasoning about argumentative structures. This hybrid approach allows
-for end-to-end learning while maintaining the interpretability and
-expressiveness of the symbolic component.
-
-Another relevant work is \citep{totis2023smproblog}, which extends the
-ProbLog framework by incorporating the Stable Model semantics from Answer Set
-Programming (ASP). This extension, known as \textsc{smProbLog}, enables the
-modeling of more complex argumentative patterns, such as negative cycles, which
-may arise in contradictory or even vague argumentative contexts. By adopting
-stable model semantics, \textsc{smProbLog} provides a more expressive framework
-for argumentation, allowing for richer representations of argumentative
-structures and their interactions.
-
-This dissertation examines how probabilistic logic programming, through the usage of
-knowledge compilation compilation techniques, can build end-to-end
-Neuro-Symbolic pipelines to learn rich argumenatative structures from data,
-detecting how claims, premises, and attacks interplay in text. We aim to explore
-how Deep Probabilistic Answer Set Programming can bridge the gap
-between symbolic argumentation theory and data-driven argumentation mining. By
-embedding argumentative structures directly in probabilistic circuits, we aim to
-support transparent reasoning, quantified uncertainty, and efficient integration
-with neural learning.
-
-This works aims to explore the following topics:
+This dissertation examines how probabilistic ASP (PASP) can be compiled into
+structured probabilistic circuits that support tractable inference and learning.
+By embedding argumentative constraints into compiled circuits we seek to align
+neural predictions with the semantics of bipolar argumentation, enabling
+transparent reasoning, calibrated uncertainty, and scalable training loops. The
+central questions we explore are:
 \begin{itemize}
-  \item How to formalize argumentation mining tasks as PASP programs that
-  capture the mutual influence of claims, premises, and attacks while retaining
-  probabilistic semantics for uncertain or conflicting evidence.
-  \item The development of knowledge compilation pipeline that encodes PASP
-  programs into structured probabilistic circuits amenable to tractable inference.
-  \item Techniques for converting such circuits into differentiable structure
-  that may be used in neuro-symbolic learning strategies that exploit the compiled
-  circuits to align neural predictions with argumentative constraints, paving the
-  way for scalable argumentation mining under uncertainty.
+  \item How can argumentation mining tasks be encoded as PASP programs that
+  capture the mutual influence of claims, premises, supports, and attacks while
+  preserving probabilistic semantics for uncertain or conflicting evidence?
+  \item Which knowledge compilation strategies can translate these PASP
+  encodings into circuits that admit efficient marginal and conditional
+  inference?
+  \item How can the resulting circuits interface with neuro-symbolic learning,
+  allowing gradients or other learning signals to flow through compiled
+  structure without sacrificing explainability?
 \end{itemize}
 
-The remainder of this document is organized as follows. The first three chapters
-Chapters \autoref{ch:sat}, \autoref{ch:amc}, and \autoref{ch:asp} reviews basic
-concepts in propositional satisfiability, model counting over semirings, and
-logic programming foundations. After, in Chapter \autoref{ch:contribution},
-we introduce how PASP can used to encode argumentative structures. Building on
-this, we introduce basic concepts related to Knowledge Compilation and the
-proposed pipeline for end-to-end Neuro-Symbolic learning for argumentation
-mining. Finally, we situate our approach within existing work, and discuss
-future directions.
+The remainder of this document is organized as follows. Chapters
+\autoref{ch:sat}, \autoref{ch:amc}, and \autoref{ch:asp} review background on
+propositional satisfiability, algebraic model counting, and logic programming
+with stable models. Chapter \autoref{ch:contribution} then introduces our PASP
+encoding of bipolar argumentation, the knowledge compilation pipeline that
+supports it, and the circuit properties required for efficient inference. We
+later position our approach with respect to the literature and discuss the
+experimental questions that guide our evaluation.

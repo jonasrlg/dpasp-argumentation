@@ -5,98 +5,52 @@
 \label{ch:amc} % For referencing the chapter elsewhere, use \autoref{ch:examples}
 %----------------------------------------------------------------------------------------
 
-The SAT problem can be coined as the cornerstone of
-almost all research relating intractable problems in Computer
-Science. Its pure logical nature arises many problems related
-to Combinatorial or decision problems \citep{Cook_1971,
-levin1973universal}. While SAT itself is a decision
-problem, its optimization counterpart, the Max-SAT
-problem, is also of great importance in many fields, from
-Artificial Intelligence to Operations Research \citep{kolokolov2013analysis, gomes2006power}
-and many other fields. On the other hand, the Sharp-SAT problem elevates
-the combinatorial nature of SAT to a counting problem,
-which increases its complexity and allows it as a reduction to
-model many other counting problems \citep{valiant1979189}.
+Chapter \autoref{ch:sat} introduced SAT and its counting and optimisation
+variants. Weighted model counting (WMC) is especially important for us because
+it reduces many probabilistic inference tasks to summing weights over satisfying
+assignments \citep{darwiche2002logical,chavira2008probabilistic}. By encoding,
+for example, a Bayesian network as a propositional theory whose literals carry
+probabilities, WMC answers marginal queries through purely logical machinery.
 
-Another relevant generalization of SAT is the WMC, a
-probabilistic generalization of Sharp-SAT, where each
-assignment of the variables in the propositional logic theory
-has an associated weight, and the problem is to compute the
-sum of weights of all satisfying assignments.
-
-The great importance of WMC, defined in Chapter
-\ref{ch:sat}, is due to the fact that it provides a framework for performing probabilistic
-inference. This result stems from the possibility of reducing
-probabilistic inference calls to WMC on a propositional
-knowledge base \cite{chavira2008probabilistic}. Specifically,
-this approach derives from the possibility of encoding the
-target probabilistic model, usually represented as a Bayesian Network,
-into a set of propositional clauses, where each clause is a
-knowledge base in CNF, and then assign weights to the
-CNF variables based on the network probabilities
-\citep{darwiche2002logical,chavira2006compiling,
-chavira2008probabilistic,sang2005performing, costa2012clp}.
-
-This possibility of reducing general probabilistic inference
-queries on Bayesian Networks to WMC not only provides a declarative
-method for encoding local structure (specific properties of
-network parameters) and a powerful way for exploiting available
-evidence \citep{chavira2008probabilistic}, but also enables the
-use of highly optimized SAT solvers or Knowledge Compilation techniques
-\citep{kimmig2017algebraic, chavira2008probabilistic}, which
-renders some of today's most efficient techniques for
-probabilistic inference \citep{kimmig2017algebraic}.
-
-Given the importance of all problems described above, a unified
-framework capable of modeling all of them was proposed, called
-Algebraic Model Counting (AMC) \citep{kimmig2017algebraic}. Moreover, a second level
-of this framework, naturally called Second-Level Algebraic Model Counting (2AMC), was proposed
-recently \citep{kiesel2022efficient}, which is capable of
-reducing inference in PASP.
+Knowledge compilation builds on this reduction: once a theory has been compiled
+into a circuit that supports fast WMC, evidence and query evaluation become
+linear in the circuit size \citep{chavira2006compiling,kimmig2017algebraic}. To
+reason about PASP we need a framework that encompasses classical SAT, WMC, and
+other algebraic tasks. Algebraic Model Counting (AMC) provides precisely that
+unifying perspective \citep{kimmig2017algebraic}. A recent extension, second
+level AMC (2AMC), further captures probabilistic ASP inference
+\citep{kiesel2022efficient}. This chapter introduces these abstractions and
+prepares the ground for the compilation pipeline described later.
 
 %------------------------------------------------
 
-\section{Algebraic Model Counting}
+\section{From SAT to AMC}
 
-Before defining the AMC problem, we need to define the
-type algebraic structure that is used to generalize tasks
-such as SAT, Sharp-SAT and WMC. More
-specifically, by generalizing these SAT-like problems
-to a more abstract WMC over a different algebraic
-structure, a \textit{comutative semiring}, we can define the
-AMC problem as follows \citep{kimmig2017algebraic}:
+Before defining AMC we recall the algebraic structure that underpins it.
+Generalising from simple numeric addition and multiplication allows us to model
+counting, optimisation, and probability computations within the same template.
 
 \section{Semirings}
 
 \begin{definition}[Semiring]
     A semiring is an algebraic structure $(\mathcal{A}, \oplus,
-    \otimes, e_{\oplus}, e_{\otimes})$, where addition $\oplus$
+    \otimes, e_{\oplus}, e_{\otimes})$ where addition $\oplus$
     and multiplication $\otimes$ are associative binary
-    operations over the set $\mathcal{A}$, $\oplus$ is
-    commutative, $\otimes$ distributes over $\oplus$,
-    $e_{\oplus} \in \mathcal{A}$ is the neutral element of (the
-    sum operator) $\oplus$, $e_{\otimes} \in \mathcal{A}$ is the
-    neutral element of (the product operator) $\otimes$, and for
-    all $a \in \mathcal{A}$, $e_{\oplus} \otimes a = a \otimes
-    e_{\oplus} = e_{\oplus}$. In a commutative semiring,
-    $\otimes$ is commutative as well.
+    operations on $\mathcal{A}$, $\oplus$ is commutative,
+    $\otimes$ distributes over $\oplus$, $e_{\oplus}$ and
+    $e_{\otimes}$ are neutral elements for $\oplus$ and $\otimes$,
+    respectively, and $e_{\oplus}$ annihilates multiplication:
+    $e_{\oplus} \otimes a = a \otimes e_{\oplus} = e_{\oplus}$
+    for every $a \in \mathcal{A}$. In a \emph{commutative}
+    semiring, multiplication $\otimes$ is also commutative.
 \end{definition}
 
-One particular notable semiring is the \textit{Tropical
-Semiring}, in the context of \textit{idempotent analysis}, where
-the sum operator $\oplus$ is defined as the minimum operator,
-and the product $\otimes$ operator is defined as the usual real
-sum. The set $\mathcal{A}$ in this case is the set of extended
-real numbers, $\Set{\mathbb{R} \cup \Set{+\infty}}$. This
-important semiring has various applications, with a special
-focus in \textit{Tropical Analysis} and \textit{Tropical
-Geometry}, and is named after Imre Simon's extensive work on
-this specific semiring \citep{simon1988recognizable}. Within the
-context of AMC, the \textit{Tropical Semiring} can be used
-to perform the Max-SAT problem, where the sum operator is
-responsible for counting the number of satisfied clauses, and
-the maximum operator is responsible for finding the maximum
-number of satisfied clauses.
+Semirings appear throughout computer science. The \emph{tropical} semiring, for
+instance, replaces addition with the minimum operator and multiplication with
+the standard addition over extended real numbers
+\citep{simon1988recognizable}. When used with AMC it captures optimisation tasks
+like Max-SAT: summations aggregate clause scores while products accumulate costs
+along a derivation.
 
 \section{Algebraic Model Counting}
 
@@ -107,7 +61,7 @@ number of satisfied clauses.
         variables $\mathcal{V}$;
         \item A commutative semiring $(\mathcal{A}, \oplus,
         \otimes, e_{\oplus}, e_{\otimes})$; and
-    \item A labeling function $\alpha: \mathcal{L}
+        \item A labelling function $\alpha: \mathcal{L}
         \rightarrow \mathcal{A}$, mapping literals $\mathcal{L}$
         of the variables in $\mathcal{V}$ to elements of the
         semiring set $\mathcal{A}$.
@@ -157,6 +111,23 @@ function to represent a probability distribution over the
 literals, setting $a(v) \in [0,1]$ and $a(\overline{v})$ to be
 its complement.
 
+\begin{example}
+    Consider the theory $T = (a \lor b)$ and the probability
+    semiring $\big(\mathbb{R}_{\geq 0}, +, \times, 0, 1\big)$.
+    Let the labelling function assign weights
+    $\alpha(a)=0.6$, $\alpha(\neg a)=0.4$, $\alpha(b)=0.3$, and
+    $\alpha(\neg b)=0.7$. The models that satisfy $T$ are all
+    assignments except $(\neg a, \neg b)$. Applying the AMC
+    formula yields
+    \[
+        A(T) = 1 - \alpha(\neg a)\alpha(\neg b)
+             = 1 - 0.4 \times 0.7 = 1 - 0.28 = 0.72,
+    \]
+    which coincides with the probability that at least one of
+    $a$ or $b$ is true. This simple computation mirrors the WMC
+    task we will perform on compiled circuits.
+\end{example}
+
 In fact, AMC is capable of modeling many other interesting
 problems, such as $EXPEC$ (expectation), which allows one to
 infer parameters in a Finite State Transducer model w.r.t. to a given dataset.
@@ -165,7 +136,7 @@ tuples of the form $(p, v)$, where $p \in [0,1]$ is a
 probability of an arc of the Finite State Transducer and $v \in \mathbb{R}$ is
 the value of this respective arc. Then, the operations $\oplus,
 \otimes$, neutral elements $e_{\oplus}, e_{\otimes}$, and the
-labeling function $\alpha$ are defined as follows:
+labelling function $\alpha$ are defined as follows:
 
 \begin{align*}
     (p_1, v_1) \oplus (p_2, v_2) & = (p_1 + p_2, v_1 + v_2), \\
@@ -197,10 +168,9 @@ the tuple $(p, v)$.
 %$|c|$ is the number of literals in the clause $c$.
 
 Adapted from \citep{kimmig2017algebraic}, Table \ref{tab:amc}
-summarizes the AMC problem for different logical and
-probabilistic inference tasks, describind in depth the
-respective sets, operations and labeling functions associated
-with each semi-ring.
+summarises AMC instances for different logical and probabilistic
+tasks, detailing the underlying sets, operations, and labelling
+functions for each semiring.
 
 \begin{table}
     \begin{center}
@@ -222,8 +192,8 @@ with each semi-ring.
         \end{tabular}
     \end{center}
     \caption{Examples of logical and probabilistic inference
-    tasks that can be modeled as instances of the AMC, and
-    their corresponding semirings and labeling functions.}
+    tasks that can be modelled as AMC instances, together with
+    their semirings and labelling functions.}
     \label{tab:amc}
 \end{table}
 
@@ -231,25 +201,24 @@ with each semi-ring.
 
 \end{center}
 
-Due to the importance of the semiring associated with SAT
-and probabilistic inference, we give a special name to them: the
-\textit{Boolean} and the \textit{Probability} semi-rings.
+The semirings associated with SAT and probabilistic inference are often called
+the \textit{Boolean} and the \textit{probability} semirings, respectively.
 
 Other useful problems that can be modeled by the AMC task
 are: \textit{sensitivity analysis} (SENS), \textit{probability
 of most likely states} (MPE), \textit{shortest} and
 \textit{widest path} (S-PATH and W-PATH, respectively),
 \textit{fuzzy} and \textit{k-weighted} constraints (FUZZY and
-k-WEIGHT, respetively), and $OBDD_<$ \textit{construction}
+k-WEIGHT, respectively), and $OBDD_<$ \textit{construction}
 \citep{kimmig2017algebraic}.
 
 \section{Second Level of Algebraic Model Counting}
 
-As mathematical are prone to do, there is a generalization of
+As mathematicians are prone to do, there is a generalisation of
 AMC, called 2AMC, which is capable of modeling
 problems where there is the need of a third operation, besides
 $\oplus$ and $\otimes$. This third operation appears in many
-applications, such as the Maximum a Posteriori (MAP) probabilistical query, but is
+applications, such as the Maximum a Posteriori (MAP) probabilistic query, but is
 also essential when modeling PASP problems, as we will see
 in more detail in the next chapter \ref{ch:asp}.
 
@@ -266,7 +235,7 @@ Similarly to the AMC, follows the definition of the
         \item Two commutative semiring $S_j = (\mathcal{A}_j,
         \oplus_j, \otimes_j, e_{\oplus_j}, e_{\otimes_j})$, for
         $j \in \{I, O\}$;
-        \item Two labeling function $\alpha_j: X_j \rightarrow
+        \item Two labelling functions $\alpha_j: X_j \rightarrow
         \mathcal{A}_j$, for $j \in \{I, O\}$, mapping literals
         of the variables in $X_j$ to elements of the semiring
         set $\mathcal{A}_j$; and
@@ -289,127 +258,52 @@ Similarly to the AMC, follows the definition of the
     models of $T$ given an assignment $a$.
 \end{definition}
 
-It is easy to see that AMC is an instance 2AMC, where
-the first partition is empty, $X_O = \emptyset$, and the weight
-transformation is the identity function. Thus, the leftmost half
-of the equation (all elements outside the parentheses) is equal
-applying the identity function, and the rightmost half is
-equivalent to the AMC, because the assignment $\mathbf{a}$
-inside the summation is empty, therefore, $M(T|\mathbf{a}) =
-M(T)$. This implies that 2AMC tries to solve an instance of
-AMC over the variables present in the partition $X_I$ for
-each possible assignment of the variables in $X_O$, applying a
-weight transformation to the result. From the algebraic point of
-view, this weight transformation function maps the result of the
-AMC inside the parentheses to the semiring $S_j$, used on
-the left side of the equation. Thus, this transformation enables
-one to solve a second AMC instance over the variables in
-$X_O$.
+It is easy to see that AMC is a special case of 2AMC. By choosing an empty
+outer partition ($X_O = \emptyset$) and letting the weight transformation be the
+identity, the outer summation collapses and we recover the original AMC
+expression. Intuitively, 2AMC first enumerates assignments to the \emph{outer}
+variables and re-weights the result of an \emph{inner} AMC computation on the
+remaining variables before aggregating the outcomes.
 
-Therefore, analyzing the 2AMC problem, we can see that it
-partitions variables in $\mathcal{V}$ into two sets, $X_I$ and
-$X_O$, and  then solves an inner AMC instance over the
-variables presents in $X_I$ for each assignment to $X_O$. Then,
-uses the results of this inner AMC instance to solve a
-second (level) AMC instance over the variables in $X_O$.
+A canonical example is Maximum a Posteriori (MAP) inference in probabilistic
+models. Let $T$ be a propositional theory over variables $\mathcal{V}$,
+partition its atoms into queries $Q$, evidence $E$, and the remaining hidden
+variables $R$. Given evidence $e$, MAP seeks the most likely assignment to $Q$:
+\[
+    \mathrm{MAP}(Q \mid e) = \argmax_{q} \sum_{\mathbf{r} \in \mathcal{A}(R)}
+    P(Q = q, E = e, R = \mathbf{r}),
+\]
+where $\mathcal{A}(R)$ enumerates assignments to $R$. Within 2AMC we set
+$X_O = Q$ and $X_I = R \cup E$. The inner AMC sums over the hidden variables
+for a fixed choice of $q$ and $e$, while the outer semiring combines these
+values with a maximisation operator that selects the best query assignment.
+The weight transformation $t$ merely injects the inner probability mass into
+the outer semiring so that maximisation can be performed.
 
-Perhaps, a non-trivial example of a problem that can be modeled
-as an instance of 2AMC is the MAP query, which is
-defined to be the most probable assignment $q$ given an
-evidence $e$ (the assignment of the remaining variables that is
-more likely given the evidence). Formally, given a propositional
-logic theory $T$ over variables $\mathcal{V}$, a joint
-probability distribution $P$ over $T$, a conjunction $e$ of
-observed literals for the set of evidence atoms $E$, and a set
-of ground query atoms $Q$: find the most probable assignment $q$ to $Q$
-given the evidence $e$, with $R = \mathcal{V} \setminus (Q \cup
-E)$
+To complete the specification we instantiate the two semirings and the weight
+transformation. The inner semiring is the standard probability semiring
+$S_I = ([0,1], +, \times, 0, 1)$ with a labelling function $\alpha_I$ that
+assigns unit weight to evidence literals consistent with $e$ and uses the
+distributional parameters of $T$ for the remaining atoms. Inconsistent literals
+receive weight $0$, ensuring that only models compatible with the evidence
+contribute to the sum.
 
-$$MAP(Q|e) = \argmax_q P(Q = q|e) = \argmax_q \sum_{\mathbf{r}
-\in \mathcal{A}(R)} P(Q = q, e, R = r),$$
-
-where $\mathcal{A}(R)$ denotes the set of assignments of $r$
-to $R$.
-
-Under the assumption that the distribution the Random Variables
-respective to the variables in $Q$ are independent (the
-distribution is factorized w.r.t. $Q$), we can see that MAP
-query consists of two steps:
-
-\begin{enumerate}
-    \item A first AMC task of solving the sum over the
-    truth values of the atoms in $R$, when considering fixed
-    assignments to the atoms both in $E$ and $Q$; and
-    \item A second AMC task of determining the assignments
-    to the variables in $Q$ that maximize the inner sum of the
-    first AMC task.
-\end{enumerate}
-
-This intuitive description of the MAP query illustrates how
-it could be modeled as an instance of the 2AMC problem. By
-having the partitions of variables to be $X_O = Q$ and $X_I =
-\mathcal{V} \setminus Q = R \cup E$, we have a compatible
-partition of the variables in $\mathcal{V}$ w.r.t. the MAP
-problem.
-
-With the partition of variables defined, there is still the need
-to define the semirings, labeling functions, and the weight
-transformation function $t$. Since the rightmost half of the
-equation is w.r.t. to summing the probabilities over assignments
-$r$ to $R$, the semiring used for this part of the equation is
-$S_I = ([0, 1], +, \times, 0, 1)$ (the same semiring used for
-probabilistic inference); and the labeling function $\alpha_I$ maps literals
-present in $e$ to $1$ and $0$ to their negation, $P(r)$ and
-$1 - P(r)$ to the positive and negative literals present in $R$
-(thus, the probability of assignments that are not "compatible"
-with $e$ is zero).
-
-On the other hand, the leftmost half of the equation represents
-a maximization of the truth values of the atoms in $Q$, given
-the result of the inner AMC instance. Therefore, the
-semiring used for this part of the equation is $S_O = (R^+
-\times 2^{|Q|}, \oplus_{\mathrm{argmax}},
-\otimes_{\mathrm{argmax}}, (0, \emptyset), (1, \emptyset))$,
-where
-
-$$(p_1, q_1) \oplus_{\mathrm{argmax}} (p_2, q_2) =
-\begin{cases}
-    (p_1, q_1) & p_1 > p_2 \\
-    (p_2, q_2) & p_1 < p_2 \\
-    (p_1, q_{\mathrm{min}}) & p_1 = p_2
-\end{cases}
-$$
-
-and $q_{\mathrm{min}}$ represents the smallest assigment of
-literals, w.r.t. a predefinied lexycographic order of the
-variables $Q$; and $\otimes_{\mathrm{argmax}}$ is defined as the
-product between the probabilities of the assignments, and the
-union of the assignments of the literals, $(p_1, q_1)
-\otimes_{\mathrm{argmax}} (p_2, q_2) = (p_1 \cdot p_2, q_1 \cup
-q_2)$. Moreover, to complete the definition of the this
-leftmost AMC instance, the labeling function $\alpha_O(l)$
-is defined to be: $(p, \{l\})$ for the positive literals; and
-$(1 - p, \{l\})$ for the negative ones.
-
-Finally, to completely describe MAP as an instance of the
-2AMC problem, we construct the function $t(p)$, where $p$
-is the resulting probability of the inner (rightmost) AMC
-task, as being $t(p) = (p, \emptyset)$. This weight
-transformation function takes the sum of the probabilities as
-input and just returns the Cartesian Product of the
-probability and the empty set, which is the neutral element of
-the $\oplus_{\mathrm{argmax}}$ operator. Next, the $\otimes_{
-\mathrm{argmax}}$ will take the product of the probabilities an
-assignment of a variable in $Q$ and the result probability of
-the inner AMC. In other words, the probability $P(q)$,
-where $q \in \mathbf{q}$ and $\mathbf{q}$ is the assignment of
-the variables in $Q$, is multiplied by the sum of probabilities
-conditioned on the assignment $q$ and evidence $e$. The second
-part of the tuple is the union between $q$ and $\emptyset$,
-which is equal to $q$. Thus, the $\otimes_{\mathrm{argmax}}$
-applies the Bayes Rule to the result of the inner AMC,
-multiplying the probability of the assignment of the variables.
-Therefore, the last step, $\oplus_{\mathrm{argmax}}$, takes the
-assignment that maximizes the probability of the computation
-performed by the $\otimes_{\mathrm{argmax}}$ operator, which
-results in the most probable assignment of the variables in $Q$.
+The outer semiring performs maximisation. We use
+$S_O = (\mathbb{R}_{\ge 0} \times 2^{|Q|},
+\oplus_{\mathrm{argmax}}, \otimes_{\mathrm{argmax}}, (0,\emptyset),
+(1,\emptyset))$, where
+\[
+    (p_1, q_1) \oplus_{\mathrm{argmax}} (p_2, q_2) =
+    \begin{cases}
+        (p_1, q_1) & \text{if } p_1 > p_2, \\
+        (p_2, q_2) & \text{if } p_2 > p_1, \\
+        (p_1, \min\{q_1, q_2\}) & \text{otherwise},
+    \end{cases}
+\]
+breaking ties by a fixed lexicographic order on assignments, and
+$(p_1, q_1) \otimes_{\mathrm{argmax}} (p_2, q_2) = (p_1 \cdot p_2, q_1 \cup
+q_2)$. The labelling $\alpha_O$ associates each literal with its local
+probability and the singleton set containing that literal. Finally, the weight
+transformation $t(p) = (p, \emptyset)$ carries the inner probability mass into
+the outer semiring so that the maximisation can compare different assignments.
+With these choices, 2AMC reproduces MAP inference exactly.

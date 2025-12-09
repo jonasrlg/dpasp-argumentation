@@ -3,49 +3,31 @@
 \chapter{Answer Set Programming}
 \label{ch:asp}
 
-The study of Knowledge Represenation (KR) aspires to find compromises between
-expressiveness and efficiency; so that one of the motivating
-reasons for the research in this area is the well-known fact
-that calculating entailments of arbitrary first-order logical
-Knowledge Base (KB) can be intractable \citep{levesque1986knowledge}. Even
-when considering the usage of heuristics and refinements, the
-Resolution procedure can still be exponential
-\citep{levesque1986knowledge}.
+Knowledge Representation (KR) research is driven by a familiar tension:
+expressive formalisms capture rich domains but typically incur intractable
+inference, while restricted languages admit efficient reasoning at the cost of
+what can be expressed. Full first-order logic, for example, allows us to encode
+complex knowledge bases but entailment in this setting is undecidable in
+general and, even for decidable fragments, often demands exponential resources
+\citep{levesque1986knowledge}. Despite numerous refinements, classical
+resolution-based procedures inherit this worst-case behaviour.
 
-Due to this intrinsic complexity of First-Order Logic (FOL), the main
-alternative to Knowledge Base representation is the use of less
-expressible representations, such as propositional logic. This
-idea of restricting the expressiveness of a logic formalism in
-order to obtain a more efficient reasoning procedure is a
-fundamental trade-off that characterizes the Knowledge Representation research
-\citep{levesque1987expressiveness}.
-
-In the previous appendix \ref{ch:sat}, we talked about the
-complexity class of SAT-like encompasses several hard
-computational problems, with focus on logical ones. A not so
-distant problem, from a logical standpoint, is the Resolution
-procedure, which used to calculate entailments of any
-first-order logical KB \citep{brachman2004knowledge}. In
-other words, Resolution is an inference procedure that leads to
-a refutation-complete theorem-proving technique for
-Propositional Logic and FOL.
-
-As one could imagine, by its relationship with SAT, in its
-most general form, Resolution ran into serious computational
-difficulties \citep{brachman2004knowledge}. Although refinements
-to Resolution may lead to more efficient routines, the
-complexity of this problem is intrinsically high due to its
-nature \citep{brachman2004knowledge}. This is a consequence
-of the fundamental computational intractability of first-order
-entailment.
-
-Therefore, in this chapter, we will explore the idea of limiting
-ourselves to only a certain interesting subset of FOL,
-where the Resolution procedure becomes much more manageable. We
-will also see that from a representation standpoint, that the
-subset in question, Answer Set Programming (ASP) is still sufficiently expressive
-for many real-world applications purposes, such as Argumentation
+One way to regain tractability is to move to less expressive yet carefully
+designed fragments. Propositional logic exemplifies this strategy: by grounding
+away quantifiers we can apply SAT technology, as discussed in
+Chapter~\ref{ch:sat}. Answer Set Programming (ASP) follows the same philosophy.
+It restricts syntax in a way that keeps many modelling conveniences—default
+negation, recursion, and non-monotonic reasoning—while providing a semantics
+that supports efficient solver implementations. ASP has become a workhorse for
+applications ranging from planning to computational argumentation
 \citep{toni2011argumentation}.
+
+This chapter reviews the logical foundations required for the probabilistic ASP
+encodings that we adopt later. We begin with definite programs and the
+associated semantic machinery, introduce stable-model semantics through loop
+formulas and related constructs, and then extend the language with features
+such as disjunction and cardinality constraints. These ingredients will be
+essential when we encode bipolar argumentation in Chapter~\ref{ch:contribution}.
 %----------------------------------------------------------------------------------------
 \section{Foundations of Logic Programming} \label{sec:lp}
 
@@ -67,7 +49,7 @@ programs:
     \begin{minted}{prolog}
         a :- b1, ..., bM.
     \end{minted}
-    where $a, b_1, \ldots, b_m$ are atoms of a function-free
+    where $a, b_1, \ldots, b_M$ are atoms of a function-free
     FOL $L$; and this rule can be seen as material
     implication restricted to Horn clauses, where
     \mintinline{prolog}{a :- b1, ..., bM} is read as $B \supset
@@ -107,9 +89,9 @@ efficiency. We do this by firstly defining the concept of
     The \textit{Herbrand Universe} $HU(P)$ of a logic program $P$
     is the set of all terms that can be formed from constants
     and functions in $P$ (w.r.t. a predefined vocabulary $L$).
-    Moreover, the \textit{Hebrand Base} $HB(P)$ of $P$ is the set
+    Moreover, the \textit{Herbrand Base} $HB(P)$ of $P$ is the set
     of all ground atoms that can be formed from terms and
-    predicates occurring $HU(P)$. Finally, ta \textit{Herbrand
+    predicates occurring $HU(P)$. Finally, the \textit{Herbrand
     Interpretation} is a subset of $HB(P)$, an interpretation
     $I$ (a set denoting ground \textit{truths}) over $HU(P)$.
 \end{definition}
@@ -142,9 +124,8 @@ efficiency. We do this by firstly defining the concept of
         \item $I_3 = \{h(0, 0), t(a, b, r), p(0, 0, b)\}$.
     \end{itemize}
     Note that not all interpretations are consistent with the
-    program $P$. For instance, the interpretation $I_1$ is
-    contradictory, because it contains does not contain any
-    of the facts of $P$.
+    program $P$. For instance, $I_1$ is contradictory because it
+    does not include any of the facts of $P$.
 \end{example}
 
 \subsection{Grounding of a Logic Program}
@@ -167,7 +148,7 @@ a moral formal definition of \textit{grounding}
     union of all ground instances for all the clauses in $P$).
 \end{definition}
 
-\subsection{Interpreation of a Logic Program}
+\subsection{Interpretation of a Logic Program}
 
 As we are already formalizing the concepts like grounding, the
 Interpretation of a logic program is also a concept that needs
@@ -221,8 +202,8 @@ more attention. Thus, follows its definition:
     Then, the \textit{loop formula} $LF(L,P)$ is the following
     implication:
     \begin{displaymath}
-        \bigvee_{p \in L} \neg p \subset \neg \bigwedge_{r
-        \in R-(L,P)} \mathrm{body}(r),
+        \bigvee_{p \in L} \neg p \;\rightarrow\; \neg \bigwedge_{r
+        \in R_L^{-}(L,P)} \mathrm{body}(r),
     \end{displaymath}
     where $\mathrm{body}(r)$ is the body of the rule $r$.
 \end{definition}
@@ -257,16 +238,15 @@ extensions defined above.
 
 \subsubsection{Integrity Constraints}
 
-Integrity constraints are a way of checking admissibility of
-models, by adding rules that must be satisfied by all models.
-These constraints can be written as a rule of the form
+Integrity constraints rule out interpretations that violate hard requirements.
+They are typically written as headless rules of the form
 
 \begin{minted}{prolog}
     :- b1, ..., bM, not c1, ..., not cN.
 \end{minted}
 
-But, this rules without heads can also be written with heads
-when using auxiliary predicates, such as
+The same requirement can be expressed with a head by introducing an auxiliary
+predicate:
 
 \begin{minted}{prolog}
     falsity :- b1, ..., bM, not falsity, not c1, ..., not cN,
@@ -277,16 +257,10 @@ where the auxiliary $falsity$ is a fresh propositional atom
 
 \subsubsection{Strong Negation}
 
-Strong negation is not a necessity for the definition of
-ELP, because one can emulate this concept by using
-integration constraints and (default, also called \textit{weak})
-negation. But, the introduction of this concept is at least
-enlightening, because it allows to encode knowledge that
-something is known to be false.
-
-Usually, this notion of knowing that $a$ is false is denoted
-by $\neg a$. But, in the context of ASP, the common
-notation is $- a$.
+Strong negation is not strictly required—default negation combined with
+integrity constraints can simulate it—but having a dedicated connective makes
+programs clearer. While classical logic writes the fact that $a$ is known to be
+false as $\neg a$, ASP customarily denotes it by $-a$.
 
 \subsubsection{Extended Logic Programs}
 
@@ -303,14 +277,9 @@ and strong negation, we are capable of defining ELP:
     \textit{strongly negated} atoms of a FOL.
 \end{definition}
 
-Since we showed how one could represent integrity constraints by
-using auxiliary predicates, and that strong negation can be
-described by using default negation in combination with
-integration constraints, there is no need to define a new
-semantic for this type of logic programs.
-
-The only main ``difference'' is given by the fact that stable
-models of ELPs are called \textbf{\textit{answer sets}}.
+Because integrity constraints and strong negation can be reduced to the basic
+semantics, we do not need a new notion of model: stable models of extended
+programs remain \emph{answer sets}.
 
 \subsubsection{Disjunctive Logic Programs}
 
@@ -328,20 +297,13 @@ the addition of disjunctions on the head of rules:
     denote conjunctions).
 \end{definition}
 
-The semantics for an EDLP can be defined similarly to the
-ones for an ELP or normal logic program, with two main
-difference: instead of choosing a stable model $M$ of $P$ (i.e.,
-$M$ being the least model of the reduct $P^M$), we define the
-\textit{answer sets} $M$ of $P$ as the \textit{minimal model} of
-the reduct $P^M$ (since $P^M$ might have multiple minimal
-models); and there is the need to adjust the completion to suit
-heads with disjunctions. Completion of Disjunctive Logic
-Programs, as defined by \cite{alviano2016completion}, is a
-generalization of Clark's completion, where one has to consider
+The semantics of EDLPs mirror those of extended programs with two additions:
+answer sets are now minimal models of the reduct $P^M$ (which may have multiple
+minimal models), and Clark's completion must be generalised to cope with
+disjunctive heads \citep{alviano2016completion}.
 
-Finally, we define Intepretations for EDLPs, that unifies
-different types of extensions that lead from
-\citep{wielemaker2012swi} to the development of Answer Set Programming.
+Finally, we recall the notion of interpretation for EDLPs, unifying the various
+extensions that lead from normal logic programs to full ASP.
 
 \begin{definition}[Interpretation (of an EDLP)]
     Let $P$ be an EDLP. An interpretation $I$ is a model
@@ -360,8 +322,8 @@ different types of extensions that lead from
 
 \subsection{Cardinality Constraints}
 
-The last extension that characterizes Answer Set Programming is called
-\textit{cardinality constraint}, which are constructs of the
+The last extension that characterises Answer Set Programming is the notion of
+\textit{cardinality constraints}, constructs of the
 form: \mintinline{prolog}{L \{l1, ..., ln \} U}, that are
 satisfied whenever the number of satisfied literals $l_i$ is
 between the integral bounds $L$ and $U$, inclusive
@@ -372,7 +334,7 @@ body is satisfied.
 
 \subsubsection{Choice Rules}
 
-An special case of cardinality constraints are \textit{choice
+A special case of cardinality constraints are \textit{choice
 rules}: rules where the head is enclosed in brackets and
 represent the idea that the head can be included in a stable
 model only if the body holds; but it can be left out, too
@@ -387,6 +349,6 @@ through normal rules by introducing a new atom. For example,
     is equivalent to the Normal logic program $P'$:
     \begin{minted}{prolog}
         a :- not aa, b, not c.
-        aa:- not a.
+        aa :- not a.
     \end{minted}
 \end{example}

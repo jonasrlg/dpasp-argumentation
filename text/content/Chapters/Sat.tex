@@ -6,85 +6,25 @@
 
 % %---------------------------------------------------------------
 
-Logic concerns two main interdefinable ideas:
-\textit{consistency} and \textit{validity} \citep{franco2009history}.
-Moreover, this strongly
-interconnected relationship can be described either
-syntactically or semantically, where the former approach
-results in definitions related to \textit{proof theory}; and
-the latter one to \textit{model theory}.
+Logic revolves around two tightly linked notions: \textit{consistency} and
+\textit{validity} \citep{franco2009history}. Proof theory studies these notions
+from a syntactic perspective by manipulating symbols using axioms and inference
+rules; model theory examines them semantically by interpreting sentences over
+structures that encode the ``world''. Although the two views emphasise different
+objects, they coincide for complete axiom systems: a statement that can be
+derived syntactically is precisely one that is true in every model, and
+unsatisfiable theories are those that entail a contradiction.
 
-When considering the first approach, it is necessary to take
-into consideration that the \textit{syntax} is restricted to
-definitions that refer to the syntactic form of the sentences
-in question, the grammatical structure of the language. For
-\textit{proofs} to be carried out, it is necessary to define
-an axiom system, with a set of axioms and inference rules that
-allows the derivation of theorems, where \textit{derivability}
-is the syntatic notion of \textit{validity}
-\citep{franco2009history}. Similarly, the notion of
-\textit{consistency} under a syntactic approach is defined as
-the impossibility of deriving a contradiction from a set of
-related sentences \citep{franco2009history}. Since,
-\textit{consistency} is defined with respect to
-\textit{derivability}, and the latter is defined entirely
-syntactically, the notion of both \textit{consistency} and
-\textit{validity} are also syntactic.
-
-
-On the other hand, a semantic approach, that gives rise to
-\textit{model theory}, is concerned with the concept of
-\textit{truth}, with respect to the interpretation of some
-algebraic structure, usually referred to as \textit{the world},
-where the sentences are interpreted as \textit{true} or
-\textit{false} via a well-defined function
-\citep{franco2009history}. Similarly to the syntatic approach,
-both the semantic versions of \textit{validity} and
-\textit{consistency} are defined under the same concept, this one
-being the concept of \textit{structure}. In \textit{model theory},
-the \textit{validity} ideia is also called \textit{validity},
-where an argument is valid if, whenever the premises are true,
-so is the conclusion. As for the semantic version of the
-\textit{consistency} concept, on the other hand, it is called
-\textit{satistiability}. A set of formulas is said to be
-\textit{satisfiable} if there is some structure in which all of
-its components are \textit{true}; if such structure does not
-exists, the set is said to be \textit{unsatisfiable}
-\citep{franco2009history}.
-
-Even though both the syntactic and semantic versions of
-\textit{validity} and \textit{consistency}, \textit{derivability}
-and \textit{consistency}, respectively, have vastly different
-definitions, the concepts from these two branches of logic are
-closely intertwined. For a \textit{complete} axiom system, it is
-true that the syntactic and semantic concepts match up so as to
-\textit{validity} and \textit{consistency} coincide exactly, and
-the same for \textit{derivability} and \textit{satisfiability}.
-
-A very explicit relationship between \textit{satistiability} and
-\textit{proof theory} resides on the next chapter about Answer
-Set Programming (ASP - Chapter\ref{ch:asp}), in which the need for efficient algorithms to
-solve \textit{satistiability} problems is crucial for the
-development of ASP solvers. Moreover, this intrinsic
-relationship between \textit{satisfiability} and many other
-Computer Science problems is also reflected by the work of
-Shannon, who paved the way for the connection between Logic and
-Circuits \citep{shannon1938symbolic}, which enabled advancements
-such as Binary Decision Diagrams (BDDs) \citep{akers1978binary, bryant1986graph}, that
-were thought to be (during the 80's and 90's) the best way to
-tackle real-world applications related to logical problems, such
-as SAT and \textit{model counting}
-\citep{akers1978binary, bryant1986graph}.
-
-This relation between SAT and Circuits Theory, despite being a
-well-studied subject, is also what motivates the development of
-this dissertation. Since the complexity relationships that
-carry over from  \textit{satistiability} deeply influence the
-complexity of developing efficient methods for solving
-Probabilistic Answer Set Programming (PASP)
-and other Probabilistic Logic Programming (PLP) problems; what makes the development of
-efficient algorithms both challenging and open to new research
-opportunities.
+The bridge between proof theory and model theory is central to this thesis.
+Efficient algorithms for propositional satisfiability (SAT) allow us to reason
+about the models of logic programs, while proofs about circuit properties ensure
+that the compiled artefacts faithfully capture the semantics of the original
+theories. Shannon's connection between Boolean logic and circuits
+\citep{shannon1938symbolic} sparked a line of work that culminated in modern
+knowledge compilation techniques, such as Binary Decision Diagrams (BDDs)
+\citep{akers1978binary, bryant1986graph} and Sentential Decision Diagrams (SDDs).
+These structures will later support our probabilistic Answer Set Programming
+encodings.
 
 % %---------------------------------------------------------------
 
@@ -166,29 +106,20 @@ Theories}.
 
 \section{Satisfiability}
 
-The SAT problem is a fundamental problem in both Artificial Intelligence and
-Theory of Computation. This importance is due
-not only by the logical nature of SAT, but also by the fact
-that all NP problems can be reduced to SAT in
-polynomial time, thus its NP-completeness \citep{Cook_1971,
-levin1973universal}. In this manner, the SAT problem is a
-natural candidate for encoding not only arbitrary a wide range
-of logical theories, but also for encoding any NP problem
-in general. Therefore, methods to solve SAT fast are of
-great interest.
+Propositional satisfiability (SAT) is one of the cornerstones of theoretical
+computer science. Every problem in NP polynomially reduces to SAT, which
+establishes its NP-completeness \citep{Cook_1971, levin1973universal}. Because
+of this universality, SAT provides a convenient target for reasoning about
+diverse logical theories. Later chapters will rely on SAT when translating PASP
+encodings into propositional form so that we can leverage mature SAT and model
+counting machinery.
 
-Later in this work, when we discuss probabilistic inferences related
-to Probabilistic Argumentation (via Probabilistic Answer Set Programming),
-we will see that being able to solve numerous logical queries in polynomial
-time is a desirable feature, in order to scale an argumentation mining
-problem over learning Neural Networks. Therefore, our goal
-will not be to solve SAT only once; the necessity of
-solving it many times creates the need to develop tractable
-methods for solving multiple queries.
-
-Thus, we begin this thesis with a formal definition of the
-SAT problem and its variations, such as Max-SAT and
-Sharp-SAT (\textsc{\#SAT} - also known as SAT-Counting).
+In neuro-symbolic settings we seldom solve SAT just once; instead we evaluate
+many related queries that differ by evidence or parameter values. This calls
+for solving SAT-like problems in a way that enables reuse, motivating the
+knowledge compilation techniques studied throughout this thesis. We therefore
+start by recalling baseline notions of satisfiability and its counting and
+optimization variants.
 
 \subsection{Satisfiability}
 
@@ -333,3 +264,9 @@ model counting}.
         [\!\![ \phi(a) ]\!\!].
     \end{displaymath}
 \end{definition}
+
+Weighted model counting subsumes the previous variants: setting all weights to
+$1$ recovers model counting, while restricting weights to $\{0,1\}$ captures
+ordinary SAT. In Chapter \autoref{ch:amc} we will further generalise this view
+using algebraic structures that allow us to express probabilistic inference and
+other reasoning tasks within a single framework.
