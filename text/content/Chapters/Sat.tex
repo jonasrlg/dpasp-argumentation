@@ -150,96 +150,57 @@ satisfiable. On the other hand, the CNF $x \land
 
 \subsection{MAX-SAT}
 
-The Max-SAT problem is the problem of finding an assignment
-that satisfies the maximum number of clauses in a given CNF
-\citep{KRENTEL1988490}.
+Max-SAT generalises satisfiability by searching for the assignment that
+optimises how many clauses evaluate to true \citep{KRENTEL1988490}. The
+classical (unweighted) variant simply counts satisfied clauses.
 
 \begin{definition}[MAX-SAT]
-    Formally, let $\phi$ be a
-    CNF over variables $x_1, \ldots, x_n$. Then, the
-    Max-SAT problem is to find an assignment $a$ that maximizes the
-    sum of the Iverson brackets of the clauses in $C$, such that:
-    \begin{displaymath}
-        \phi(a) = \bigwedge_{c \in C} c(a),
-    \end{displaymath}
-    where $c(a)$ is the evaluation of $c$ over the assignment $a$, and
-    $[\!\![c(a)]\!\!]$ is the Iverson bracket, which is equal to $1$ if $c(a)$
-    is $True$, and $0$ otherwise.
+    Let $\phi$ be a CNF whose clause set is $C$. The Max-SAT objective is
+    \[
+        \max_{a \in \{0,1\}^n} \sum_{c \in C} [\![ c(a) ]\!],
+    \]
+    where $[\![c(a)]\!]$ is the Iverson bracket that yields $1$ when clause $c$
+    evaluates to $True$ under assignment $a$ and $0$ otherwise, and $n$ is the
+    number of variables in $\phi$.
 \end{definition}
 
-Sometimes, the Max-SAT problem refers to the weighted
-version of the problem, where each clause has a non-negative
-weight, and the goal is to maximize the sum of the weights
-of the satisfied clauses.
+We can additionally attach a non-negative weight $w(c)$ to each clause and seek
+the maximum weighted sum of satisfied clauses.
 
 \begin{definition}[Weighted MAX-SAT]
-    Formally, let $\phi$ be a CNF over variables $x_1,
-    \ldots, x_n$, and let $w: C \rightarrow \mathbb{R}^+$ be the
-    weight function over the clauses of $\phi$. Then, this
-    variant of the Max-SAT problem, called \textit{Weighted} Max-SAT, is defined
-    as the problem of finding an assignment $a$ such that it maximizes the
-    following:
-    \begin{displaymath}
-        \sum_{c \in C} w(c) \cdot [\!\![ c(a) ]\!\!],
-    \end{displaymath}
-    subject to the constraint that
-    \begin{displaymath}
-        \phi(a) = \bigwedge_{c \in C} c(a).
-    \end{displaymath}
+    The weighted Max-SAT problem is
+    \[
+        \max_{a \in \{0,1\}^n} \sum_{c \in C} w(c)\,[\![c(a)]\!].
+    \]
 \end{definition}
 
-An interesting difference between the SAT and Max-SAT
-is that the former is a decision problem, while the latter is an
-optimization problem. Another relation between them is that
-SAT is a special case of the Max-SAT, where it is
-possible to obtain a solution where the maximum number of
-possible clauses satisfied is the total number of clauses. Thus,
-there is a reduction from SAT to Max-SAT, which is
-polynomial in time. Moreover, because of this reduction, one can
-claim that the Max-SAT problem is NP-hard, since
-SAT is NP-complete.
-
-The reduction from Max-SAT to weighted Max-SAT is
-simple too: just set all weights to $1$ (or any other constant),
-and the problem is reduced to the unweighted version. Therefore,
-the weighted version of the problem is also NP-hard, as one
-would expect. Moreover, the Max-SAT problem is also
-OptP-complete (Optimization Polynomial Time), similar to the
-\textit{Traveling Salesman} and \textit{Knapsack} problems \citep{KRENTEL1988490}.
+SAT is a special case of Max-SAT: a CNF is satisfiable iff the optimum equals
+$|C|$. Consequently, Max-SAT is NP-hard. Setting all weights to $1$ reduces the
+weighted variant to the unweighted one, confirming that the weighted problem
+inherits NP-hardness. Krentel further shows that Max-SAT is OptP-complete,
+placing it alongside optimisation problems such as \textsc{TSP} and
+\textsc{Knapsack} \citep{KRENTEL1988490}.
 
 \subsection{Sharp-SAT}
 
-Differently from the SAT and Max-SAT problems, the
-$\#SAT$ (or Sharp-SAT) problem is a counting problem, where
-the goal is to count the number of solutions of a given CNF
-has \citep{valiant1979189}. Therefore, one can see the
-Sharp-SAT problem closer to Levin studied problems
-\citep{levin1973universal} than Cook's \citep{Cook_1971}, in the
-sense that the goal is to retrieve a solution, because there
-will always be one. A way to perform this computation would be
-a search problem over \textbf{all} possible assignments over the
-variables of the CNF, and count the number of them that
-satisfy the formula. Note that this is different from search
-problems, where finding one solution solves the problem, and the
-search can be stopped.
+Unlike SAT and Max-SAT, the $\#SAT$ (Sharp-SAT) problem is a counting task: it
+asks how many satisfying assignments a CNF admits \citep{valiant1979189}. This
+places $\#SAT$ closer to the counting problems studied by Levin
+\citep{levin1973universal} than to Cook's decision formulation \citep{Cook_1971}:
+there is always an answer, but enumerating it may require exploring all
+assignments rather than stopping after the first model is discovered.
 
-This relation between Sharp-SAT and SAT variations
-does not stop here. The Sharp-SAT is clearly NP-hard,
-since it is possible to reduce SAT to Sharp-SAT in
-polynomial time, because knowing the number of solutions of a
-CNF is equivalent to knowing whether it has at least one
-solution. Moreover, Sharp-SAT is a Sharp-P-complete
-problem (or $\#P\mathrm{-complete}$), which means that it is
-capable of reducing the set of the counting problems associated
-with the decision problems in the set NP.
+Counting solutions is at least as hard as deciding their existence. Every SAT
+instance can be solved by verifying whether the corresponding $\#SAT$ count is
+non-zero, so $\#SAT$ is NP-hard. Valiant further proved that it is
+$\#\text{P}$-complete, meaning that any counting problem associated with an
+NP decision problem can be reduced to $\#SAT$.
 
 \begin{definition}[\#SAT]
     Formally, let $\phi$ be a CNF over variables $x_1,
-    \ldots, x_n$. Then, the Sharp-SAT  problem is to find
-    the natural number $n$ such that
+    \ldots, x_n$. The Sharp-SAT problem asks for the quantity
     \begin{displaymath}
-        \#SAT(\phi) = | \{ a \in \{0,1\}^n \mid a \text{ is an
-        assignment of } \phi \}|.
+        \#SAT(\phi) = \big| \{ a \in \{0,1\}^n \mid \phi(a) = True \} \big|.
     \end{displaymath}
 \end{definition}
 

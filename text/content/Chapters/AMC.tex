@@ -76,40 +76,35 @@ along a derivation.
 \end{definition}
 
 To anyone familiar with introductory algebra, it is easy to see
-that the definition above for the AMC problem indeed
-reduces many of the presented SAT like problems. For
+that the construction above subsumes many SAT-like problems. For
 example, by setting the semiring to
 $$ (\mathcal{A}, \oplus, \otimes, e_{\oplus}, e_{\otimes}) =
 (\{\mathit{true}, \mathit{false}\}, \lor, \land, \mathit{false},
 \mathit{true}),$$
 
-and $\alpha$ maps positive literals to \textit{true} and negative
-literals to \textit{false}, we can see that the AMC problem
-is capable of solving the SAT problem. Moreover, by setting
-a similar semiring
+and mapping every literal to $\mathit{true}$ through $\alpha$, the AMC
+expression collapses to Boolean reasoning and therefore decides SAT. Moreover,
+by choosing
 
 $$ (\mathcal{A}, \oplus, \otimes, e_{\oplus}, e_{\otimes}) =
 (\mathbb{N}, +, \times, 0, 1),$$
 
-and $\alpha$ to map literals to $1$ and $0$, if they
-are positive or negative, respectively, we can see that the
-AMC models model counting.
+and mapping both positive and negative literals to $1$, the resulting AMC
+computation counts how many models satisfy the theory.
 
 Similarly, by only changing the set $\mathcal{A}$ of the
-semiring to $\mathbb{R}^+$ (non-negative real numbers) and
-$\alpha$ to also map literals to $\mathbb{R}^+$, we can see that
-the AMC problem is capable of solving the WMC problem.
+semiring to $\mathbb{R}_{\ge 0}$ (non-negative real numbers) and
+letting $\alpha$ assign literal weights in $\mathbb{R}_{\ge 0}$, the AMC
+problem recovers weighted model counting.
 
-Moreover, by the results cited previously about Bayesian Networks, one can see
-that this also means that AMC is also capable of reducing
-general probabilistic inference \citep{darwiche2002logical,chavira2006compiling,
-chavira2008probabilistic,sang2005performing}. However, the
-algebraic structure of AMC makes it easy to show that it is
-capable of modeling probabilistic inference: by using the same semiring used to
-model the WMC problem and just by changing the $\alpha$
-function to represent a probability distribution over the
-literals, setting $a(v) \in [0,1]$ and $a(\overline{v})$ to be
-its complement.
+Moreover, the results cited previously about Bayesian networks imply that AMC
+also captures probabilistic inference
+\citep{darwiche2002logical,chavira2006compiling,
+chavira2008probabilistic,sang2005performing}. The algebraic structure makes the
+connection explicit: using the same semiring and defining
+$\alpha(v) \in [0,1]$ as the probability of literal $v$, with
+$\alpha(\neg v) = 1 - \alpha(v)$ for binary variables, yields the desired
+probability mass assignments.
 
 \begin{example}
     Consider the theory $T = (a \lor b)$ and the probability
@@ -130,13 +125,13 @@ its complement.
 
 In fact, AMC is capable of modeling many other interesting
 problems, such as $EXPEC$ (expectation), which allows one to
-infer parameters in a Finite State Transducer model w.r.t. to a given dataset.
-Hence, the elements of the respective expectation semiring are
-tuples of the form $(p, v)$, where $p \in [0,1]$ is a
-probability of an arc of the Finite State Transducer and $v \in \mathbb{R}$ is
-the value of this respective arc. Then, the operations $\oplus,
-\otimes$, neutral elements $e_{\oplus}, e_{\otimes}$, and the
-labelling function $\alpha$ are defined as follows:
+infer parameters in a finite-state transducer relative to a given dataset.
+The elements of the respective expectation semiring are
+tuples of the form $(p, v)$, where $p \in [0,1]$ is the
+probability of traversing a particular arc and $v \in \mathbb{R}$ is
+the value contributed by that arc. The operations $\oplus,
+\otimes$, neutral elements $e_{\oplus}, e_{\otimes}$, and a suitable
+labelling function are defined as follows:
 
 \begin{align*}
     (p_1, v_1) \oplus (p_2, v_2) & = (p_1 + p_2, v_1 + v_2), \\
@@ -144,15 +139,10 @@ labelling function $\alpha$ are defined as follows:
     v_2 + p_2 \cdot v_1), \\
     e_{\oplus} & = (0, 0), \\
     e_{\otimes} & = (1, 0), \\
-    \alpha(a) & =
-    \begin{cases}
-        (p, 1) & \text{if } i = k, \\
-        (p, 0) & \text{else.}
-    \end{cases},
+    \alpha(a) & = (p_a, p_a \cdot v_a),
 \end{align*}
 
-where $a$ is the respective arc of the Finite State Transducer, in relation to
-the tuple $(p, v)$.
+where each arc $a$ carries probability $p_a$ and reward $v_a$.
 
 %Furthermore, the AMC problem also is capable of reducing
 %Max-SAT to it, by setting the semiring $(\mathbb{R}^+,
@@ -197,10 +187,6 @@ functions for each semiring.
     \label{tab:amc}
 \end{table}
 
-\begin{center}
-
-\end{center}
-
 The semirings associated with SAT and probabilistic inference are often called
 the \textit{Boolean} and the \textit{probability} semirings, respectively.
 
@@ -214,16 +200,13 @@ k-WEIGHT, respectively), and $OBDD_<$ \textit{construction}
 
 \section{Second Level of Algebraic Model Counting}
 
-As mathematicians are prone to do, there is a generalisation of
-AMC, called 2AMC, which is capable of modeling
-problems where there is the need of a third operation, besides
-$\oplus$ and $\otimes$. This third operation appears in many
-applications, such as the Maximum a Posteriori (MAP) probabilistic query, but is
-also essential when modeling PASP problems, as we will see
-in more detail in the next chapter \ref{ch:asp}.
+A natural generalisation of AMC introduces a third operation alongside
+$\oplus$ and $\otimes$. The resulting framework, called 2AMC, captures tasks
+such as Maximum a Posteriori (MAP) inference and is essential when modelling
+PASP problems, as we will see in Chapter~\ref{ch:asp}.
 
-Similarly to the AMC, follows the definition of the
-2AMC problem \citep{kiesel2022efficient}:
+We now recall the definition of the 2AMC problem
+\citep{kiesel2022efficient}:
 
 \begin{definition}[Second-Level Algebraic Model Counting]
     Given
@@ -231,13 +214,13 @@ Similarly to the AMC, follows the definition of the
         \item A propositional logic theory $T$ over a set of
         variables $\mathcal{V}$;
         \item A partition of the variables in $T$,
-        $(\mathbb{X}_I, \mathbb{X}_O)$;
-        \item Two commutative semiring $S_j = (\mathcal{A}_j,
+        $(X_I, X_O)$;
+        \item Two commutative semirings $S_j = (\mathcal{A}_j,
         \oplus_j, \otimes_j, e_{\oplus_j}, e_{\otimes_j})$, for
         $j \in \{I, O\}$;
-        \item Two labelling functions $\alpha_j: X_j \rightarrow
+        \item Two labelling functions $\alpha_j: \mathcal{L}(X_j) \rightarrow
         \mathcal{A}_j$, for $j \in \{I, O\}$, mapping literals
-        of the variables in $X_j$ to elements of the semiring
+        over the variables in $X_j$ to elements of the semiring
         set $\mathcal{A}_j$; and
         \item A weight transformation function $t:
         \mathcal{A}_I \rightarrow \mathcal{A}_O$ that respects
@@ -246,16 +229,16 @@ Similarly to the AMC, follows the definition of the
     Then the 2AMC problem is defined as the computation of
     the following expression:
     \begin{displaymath}
-        2AMC(T) = \bigoplus_{\mathbf{a} \in A(X_O)}^O
+        2AMC(T) = \bigoplus_{\mathbf{a} \in \mathcal{A}(X_O)}^O
                   \bigotimes_{a \in \mathbf{a}}^O \alpha_O(a)
                   \otimes_O t
                   \left (
                   \bigoplus_{I \in \mathcal{M}(T|\mathbf{a})}^I
                   \bigotimes_{i \in I}^I \alpha_I(i) \right ),
     \end{displaymath}
-    where $A(X)$ denotes the set of assignments of $x$ to $X \in
-    \mathcal{V}$, and $\mathcal{M}(T|a)$ denotes the set of
-    models of $T$ given an assignment $a$.
+    \noindent where $\mathcal{A}(X)$ denotes the set of assignments to the variables in
+    $X$, and $\mathcal{M}(T|\mathbf{a})$ denotes the set of models of $T$
+    consistent with assignment $\mathbf{a}$.
 \end{definition}
 
 It is easy to see that AMC is a special case of 2AMC. By choosing an empty

@@ -33,15 +33,13 @@ essential when we encode bipolar argumentation in Chapter~\ref{ch:contribution}.
 
 \subsection{Definite Logic Programs}
 
-Before diving on the semantics of Probabilistic Answer Set Programming (PASP), it is important to
-understand less expressive formalisms, such as \textit{definite}
-and \textit{propositional} programs. These formalisms are not only
-the basis where Answer Set Programming (ASP) is built upon, but also hint at the
-underlying complexity of the problems that Answer Set Programming (ASP) can solve
-and the efficiency of the algorithms that can be used in this
-context. Thus, we start by defining the simplest form of
-Logic Programming (LP), called \textit{definite} (or \textit{positive})
-programs:
+Before diving into the semantics of Probabilistic Answer Set Programming (PASP),
+it is important to understand less expressive formalisms, such as \textit{definite}
+and \textit{propositional} programs. These formalisms underpin Answer Set
+Programming (ASP): they reveal the inherent complexity of the problems ASP can
+solve and guide the design of efficient algorithms. We therefore begin by
+defining the simplest form of logic programming, namely \textit{definite} (or
+\textit{positive}) programs:
 
 \begin{definition}[Definite Logic Programs]
     A definite logic program $P$ is a finite set of clauses
@@ -68,32 +66,27 @@ programs:
     \textit{propositional} programs.
 \end{definition}
 
-We could skip the definition of propositional programs, if we
-were not interested in the complexity of this problem, that is
-not only $P-complete$, but can be solved in linear time
-(testing satisfiability of propositional (Horn) formulas)
+Although we could omit propositional programs, they are instructive from a
+complexity perspective: deciding satisfiability for propositional (Horn) programs
+is $P$-complete, yet it admits linear-time algorithms
 \citep{dowling1984linear}.
 
 \subsection{Herbrand Universe, Base and Interpretation}
 
-A natural question that arises after the definition of this new
-class of program is about its complexity. This answer largely
-depends on the type of normal program that we are dealing with.
-In search of a more formal explanation, we have to introduce
-more concepts to capture a class of programs that we are
-comfortable between the trade-off of expressiveness and
-efficiency. We do this by firstly defining the concept of
-\textit{Herbrand Universe} and \textit{Base}:
+To reason about the complexity of logic programs we need additional vocabulary.
+In particular, the notions of \textit{Herbrand Universe} and \textit{Herbrand
+Base} allow us to characterise ground instances while balancing expressiveness
+and efficiency:
 
 \begin{definition}[Herbrand Universe]
     The \textit{Herbrand Universe} $HU(P)$ of a logic program $P$
     is the set of all terms that can be formed from constants
-    and functions in $P$ (w.r.t. a predefined vocabulary $L$).
-    Moreover, the \textit{Herbrand Base} $HB(P)$ of $P$ is the set
-    of all ground atoms that can be formed from terms and
-    predicates occurring $HU(P)$. Finally, the \textit{Herbrand
-    Interpretation} is a subset of $HB(P)$, an interpretation
-    $I$ (a set denoting ground \textit{truths}) over $HU(P)$.
+    and functions in $P$ (with respect to a predefined vocabulary $L$).
+    The \textit{Herbrand Base} $HB(P)$ of $P$ is the set
+    of all ground atoms that can be formed from terms in $HU(P)$ and
+    predicates of $P$. Finally, a \textit{Herbrand
+    interpretation} is any subset $I \subseteq HB(P)$ that denotes the ground
+    atoms considered true.
 \end{definition}
 
 \begin{example}
@@ -130,29 +123,26 @@ efficiency. We do this by firstly defining the concept of
 
 \subsection{Grounding of a Logic Program}
 
-With the notion of Herbrand Universe and Base, we can now have
-a moral formal definition of \textit{grounding}
+With the notion of Herbrand Universe and Base, we can now give
+a more formal definition of \textit{grounding}
 \citep{eiter2009answer}:
 
 \begin{definition}[Grounding]
-    We define a ground instance of a clause $C$, of a logic
-    program  $P$, as any clause $C'$ obtained from $C$ by
+    A ground instance of a clause $C$ in a logic
+    program $P$ is any clause $C'$ obtained from $C$ by
     applying a substitution
-    \begin{displaymath}
-        \theta: Var(C) \rightarrow HU(P),
-    \end{displaymath}
-    where $Var(C) \in \mathcal{V}(P)$ is the set of variables
-    in $C$. Moreover, the grounding of a program $P$ is the set
-    of all possible ground instances of the clauses in $P$ and
-    is denoted by $ground(P) = \bigcup_{C \in P} ground(C)$ (the
-    union of all ground instances for all the clauses in $P$).
+    \[
+        \theta: \mathrm{Var}(C) \rightarrow HU(P),
+    \]
+    where $\mathrm{Var}(C)$ denotes the variables
+    occurring in $C$. The grounding of $P$ is the set
+    of all ground instances of its clauses and
+    is denoted by $\mathrm{ground}(P) = \bigcup_{C \in P} \mathrm{ground}(C)$.
 \end{definition}
 
 \subsection{Interpretation of a Logic Program}
 
-As we are already formalizing the concepts like grounding, the
-Interpretation of a logic program is also a concept that needs
-more attention. Thus, follows its definition:
+Having established grounding, we next formalise interpretations:
 
 \begin{definition}[Interpretation]
     The interpretation $I$ of a logic program $P$ is a model of
@@ -160,7 +150,7 @@ more attention. Thus, follows its definition:
     $I$ is a model of
 
    \begin{itemize}
-        \item A ground clause $C =$ \mintinline{prolog}{a :- b1, ..., bM, not c1, ..., cN},
+        \item A ground clause $C =$ \mintinline{prolog}{a :- b1, ..., bM, not c1, ..., not cN},
         denoted $I \models C$, if either $\Set{a, c_1, \ldots,
         c_N} \cap I \ne \emptyset$ or $\Set{b_1, \ldots, b_M}
         \not \subseteq I$;
@@ -173,11 +163,11 @@ more attention. Thus, follows its definition:
    it is compatible with all the ground instances of the clauses
    of $P$.
 
-   We call a model $I$ of a program $P$ a \textit{minimal model},
+   We call a model $I$ of a program $P$ a \textit{minimal model}
    if there is no other model $J$ of $P$ such that $J \subset
-   I$. Although, Normal logic programs can have multiple minimal models
-   for a program, it is true that Definite Logic Programs only
-   have one minimal model \citep{eiter2009answer}.
+   I$. Normal logic programs can have multiple minimal models,
+   whereas definite logic programs admit a unique minimal model
+   \citep{eiter2009answer}.
 \end{definition}
 
 \subsection{Loop Formulas}
@@ -309,7 +299,7 @@ extensions that lead from normal logic programs to full ASP.
     Let $P$ be an EDLP. An interpretation $I$ is a model
     of:
     \begin{enumerate}
-        \item A ground clause $C =$ \mintinline{prolog}{a1; ...; aK :- b1, ..., bM, not c1, ..., cN},
+        \item A ground clause $C =$ \mintinline{prolog}{a1; ...; aK :- b1, ..., bM, not c1, ..., not cN},
         denoted $I \models C$, if either $\Set{a_1, \ldots, a_K,
         c_1, \ldots, c_N} \cap I \ne \emptyset$ or $\Set{b_1,
         \ldots b_M} \not \subseteq I$;
@@ -355,15 +345,12 @@ through normal rules by introducing a new atom. For example,
 
 \section{Probabilistic Logic Programming}
 
-In order to define Probabilistic Answer Set Programming, we
-delve into how logical programs are capable of augmenting
-their capabilities to express probability distributions as
-generative models. Sato's distribution semantics \citep{sato1995statistical}
-is probably one of the most seminal works in this area, where
-the idea behind it is to define a distribution semantics that associates
-probability to a set of \textit{independent} events  in such a way that
-a unique probability measure is induced over all interpretations of
-ground atoms \citep{cozman2020joy}.
+To define Probabilistic Answer Set Programming, we first review how logic
+programs can be enriched to express probability distributions as generative
+models. Sato's distribution semantics \citep{sato1995statistical} is one of the
+seminal works in this area: it associates probability to a set of
+\textit{independent} events in such a way that a unique probability measure is
+induced over all interpretations of ground atoms \citep{cozman2020joy}.
 
 \begin{definition}[Probabilistic Fact]
     A probabilistic fact is a pair consisting of an atom $A$ and
@@ -372,15 +359,15 @@ ground atoms \citep{cozman2020joy}.
 
     Additionally, atoms of probabilistic facts may contain logical
     variables ($\alpha :: r(X_1, \ldots, X_n)$), and are therefore
-    unground. When considering this case, we interpret such a
+    ungrounded. When considering this case, we interpret such a
     probabilistic fact as the set of all grounded probabilistic
     facts, obtained after grounding the variables in the atom.
 
-    Finally, we say that probabilistic facts do not unify with the
-    head of any rule. In other word, there is no substitution $\theta$
+    Finally, probabilistic facts do not unify with the
+    head of any rule: there is no substitution $\theta$
     that makes a probabilistic fact $f$ and a rule head $h$
-    syntactically identical, we do not have $f\theta = h\theta$ for
-    any value of $f$ and $h$.
+    syntactically identical, i.e.\ $f\theta \ne h\theta$ for
+    all choices of $f$ and $h$.
 \end{definition}
 
 Note that this definition of PLPs only associates probabilities through the use
@@ -394,8 +381,8 @@ multi-valued scenarios, where probabilities are not of the type
 and $(1-p)$ of being \emph{false}; but instead we have a distribution over many
 scenarios $a(1), \ldots, a(k)$, each associated with a probability $p(i)$. This
 notion, called \textit{annotated disjunctions}, extends the previous definition
-of PLPs to Extended Disjunctive Logic Programming (EDLP), by adding
-probabilistic facts to head of rules.
+of PLPs to Extended Disjunctive Logic Programming (EDLP) by adding
+probabilistic facts to the head of rules.
 
 \begin{definition}[Annotated Disjunctive Rules]
     A probabilistic extension of an EDLP is called
@@ -409,26 +396,26 @@ probabilistic facts to head of rules.
     \begin{minted}{prolog}
         p::a
     \end{minted}
-    is a special case (and a syntactic sugar) of an ADR, where
-    \mintinline{prolog}{p::a} is equivalent to
-    \mintinline{prolog}{p::a (1-p):-f}, where $f$ is an atom
-    that is never true \citep{geh2023dpasp}.
+    is a special case (and syntactic sugar) of an ADR, where
+    \mintinline{prolog}{p::a} is equivalent to the rule
+    \mintinline{prolog}{p::a; (1-p)::dummy :- .}, with a fresh atom
+    \mintinline{prolog}{dummy} that is never derived
+    \citep{geh2023dpasp}.
 \end{definition}
 
 \subsection{Probabilistic Answer Set Programming}
 
 Although we have briefly defined Sato's distribution semantics,
-there is a need for a more formal description. Furthermore,
-this distribution semantics that Sato proposed is not well
-adapted to consider ASP programs.
+a more formal description is required here, together with adaptations that make
+the semantics compatible with ASP programs under stable models.
 
-It is important to note that we are defining a probability
-distribution over PLPs, and not logical ones. This makes
-probabilistic semantics over PLPs agnostic w.r.t. the
-logical semantics of the program, which is particularly useful
+It is important to emphasise that probabilities are assigned to entire PLPs,
+not to individual logical consequences. This makes
+probabilistic semantics over PLPs agnostic with respect to the
+underlying logical semantics, which is particularly useful
 when considering non-stratified programs that may use a
 \textit{stable model} or \textit{well-founded} semantics
-\citep{eiter2009answer, maua2020complexity}.
+\citep{eiter2009answer, maua2020complexity, geh2024dpasp}.
 
 \begin{definition}[Probabilistic Choice]
     A PLP $(P, PF)$ with $n$ probabilistic facts can
