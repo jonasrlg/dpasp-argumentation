@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Argumentation Mining with PASP — Thesis Materials</title>
+        <style>
+            :root {
+                color-scheme: light dark;
+                --bg: #f4f4f4;
+                --fg: #222;
+                --accent: #005bbb;
+                --accent-dark: #004494;
+                --card: #ffffff;
+            }
+
+            body {
+                margin: 0;
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                line-height: 1.6;
+                background: var(--bg);
+                color: var(--fg);
+            }
+
+            header {
+                background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+                color: #fff;
+                padding: 3rem 1rem 2rem;
+                text-align: center;
+            }
+
+            header h1 {
+                margin: 0 0 0.5rem;
+                font-size: clamp(2rem, 4vw, 3rem);
+            }
+
+            header p {
+                max-width: 720px;
+                margin: 0 auto;
+                font-size: 1.05rem;
+            }
+
+            .cta {
+                margin-top: 1.75rem;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                justify-content: center;
+            }
+
+            .cta a {
+                display: inline-block;
+                padding: 0.75rem 1.5rem;
+                border-radius: 999px;
+                text-decoration: none;
+                color: #fff;
+                font-weight: 600;
+                background: rgba(0, 0, 0, 0.25);
+                transition: transform 0.2s ease, background 0.2s ease;
+            }
+
+            .cta a.primary {
+                background: #fff;
+                color: var(--accent-dark);
+            }
+
+            .cta a:hover {
+                transform: translateY(-2px);
+                background: rgba(0, 0, 0, 0.35);
+            }
+
+            .cta a.primary:hover {
+                background: rgba(255, 255, 255, 0.9);
+            }
+
+            main {
+                max-width: 960px;
+                margin: 0 auto;
+                padding: 2rem 1.25rem 3rem;
+            }
+
+            section {
+                background: var(--card);
+                padding: 1.75rem;
+                border-radius: 18px;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            }
+
+            section h2 {
+                margin-top: 0;
+                font-size: 1.75rem;
+            }
+
+            .keywords {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .keywords span {
+                background: rgba(0, 91, 187, 0.12);
+                color: var(--accent-dark);
+                border-radius: 999px;
+                padding: 0.35rem 0.85rem;
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+
+            ul.resource-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            ul.resource-list li {
+                border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+                padding: 1rem 0;
+            }
+
+            ul.resource-list li:last-child {
+                border-bottom: none;
+            }
+
+            ul.resource-list a {
+                color: var(--accent-dark);
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+            ul.resource-list a:hover,
+            a.inline-link:hover {
+                text-decoration: underline;
+            }
+
+            .detail {
+                color: rgba(0, 0, 0, 0.6);
+                font-size: 0.9rem;
+                margin-top: 0.25rem;
+            }
+
+            .inline-link {
+                color: var(--accent-dark);
+                font-weight: 600;
+            }
+
+            pre.structure {
+                background: #0f172a;
+                color: #e2e8f0;
+                padding: 1rem 1.25rem;
+                border-radius: 14px;
+                overflow-x: auto;
+                font-size: 0.95rem;
+            }
+
+            footer {
+                text-align: center;
+                padding: 1.5rem 1rem 2.5rem;
+                color: rgba(0, 0, 0, 0.65);
+                font-size: 0.9rem;
+            }
+
+            @media (max-width: 640px) {
+                section {
+                    padding: 1.5rem;
+                }
+
+                .cta {
+                    flex-direction: column;
+                }
+
+                .cta a {
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Argumentation Mining with Probabilistic ASP</h1>
+            <p>
+                Undergraduate thesis by Jonas Rodrigues Lima Gonçalves (IME-USP) exploring
+                knowledge compilation techniques for Probabilistic Answer Set Programming
+                and their application to coherent argument extraction.
+            </p>
+            <div class="cta">
+                <a class="primary" href="https://raw.githubusercontent.com/jonasrlg/dpasp-argumentation/main/text/template-ime/tese.pdf">Download Thesis (PDF)</a>
+                <a href="https://raw.githubusercontent.com/jonasrlg/dpasp-argumentation/main/text/slides/slides.pdf">Defense Slides</a>
+                <a href="https://github.com/jonasrlg/dpasp-argumentation/blob/main/text/poster/Poster.tex" class="inline-link">Poster Source</a>
+                <a href="https://github.com/jonasrlg/dpasp-argumentation">GitHub Repository</a>
+            </div>
+        </header>
+
+        <main>
+            <section>
+                <h2>Abstract</h2>
+                <p>
+                    Argumentation mining seeks structured representations of argumentative
+                    discourse, yet state-of-the-art neural approaches struggle with the
+                    uncertainty and combinatorial constraints inherent to these tasks.
+                    This work investigates Probabilistic Answer Set Programming (PASP) as a
+                    unifying framework that combines the declarative modeling power of ASP
+                    with probabilistic semantics. We replace traditional integer linear
+                    programming coherence modules with a neuro-symbolic PASP pipeline and
+                    study how knowledge compilation can turn PASP programs into differentiable
+                    circuits that support scalable learning and inference.
+                </p>
+                <p>
+                    By targeting both max-entropy and credal semantics, the thesis shows how
+                    probabilistic circuits enable tractable query answering, gradient-based
+                    optimization, and integration with modern deep-learning toolchains such as
+                    PyTorch and JAX. The resulting approach broadens the expressiveness of
+                    neuro-symbolic argument mining while retaining interpretability.
+                </p>
+                <div class="keywords">
+                    <span>Probabilistic Logic Programming</span>
+                    <span>Answer Set Programming</span>
+                    <span>Knowledge Compilation</span>
+                    <span>Argument Mining</span>
+                    <span>Neuro-Symbolic AI</span>
+                </div>
+            </section>
+
+            <section>
+                <h2>Project Materials</h2>
+                <ul class="resource-list">
+                    <li>
+                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/content">Thesis manuscript sources</a>
+                        <div class="detail">
+                            Chapters, bibliography, and figures used by the IME-USP thesis template.
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/template-ime">IME-USP thesis template</a>
+                        <div class="detail">
+                            Customised LaTeX class files and styles for building the final dissertation (`tese.tex`, `tese.pdf`).
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/slides">Defense slides</a>
+                        <div class="detail">
+                            Beamer presentation (`slides.tex`, `slides.pdf`) detailing the motivation, methodology, and findings.
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/poster">Poster</a>
+                        <div class="detail">
+                            Beamer poster layout (`Poster.tex`) summarizing the knowledge-compilation approach for PASP.
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Repository Structure</h2>
+                <pre class="structure">.
+├── docs/                  # GitHub Pages site (this page)
+│   └── index.html
+└── text/
+    ├── content/           # Thesis chapters, bibliography, and figures
+    ├── slides/            # Defense presentation (LaTeX + PDF)
+    ├── poster/            # Poster source files
+    ├── proposal/          # Initial research proposal
+    └── template-ime/      # IME-USP thesis template + compiled thesis
+</pre>
+                <p>
+                    Additional resources, build scripts, and auxiliary files are included in their respective directories.
+                    For usage instructions, consult the README in each subdirectory or the
+                    <a class="inline-link" href="https://github.com/jonasrlg/dpasp-argumentation/blob/main/text/template-ime/README.md">template guide</a>.
+                </p>
+            </section>
+        </main>
+
+        <footer>
+            &copy; 2025 Jonas Rodrigues Lima Gonçalves &middot; Institute of Mathematics and Statistics — University of São Paulo
+        </footer>
+    </body>
+</html>
