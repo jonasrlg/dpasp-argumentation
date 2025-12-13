@@ -352,3 +352,282 @@ through normal rules by introducing a new atom. For example,
         aa :- not a.
     \end{minted}
 \end{example}
+
+\section{Probabilistic Logic Programming}
+
+In order to define Probabilistic Answer Set Programming, we
+delve into how logical programs are capable of augmenting
+their capabilities to express probability distributions as
+generative models. Sato's distribution semantics \citep{sato1995statistical}
+is probably one of the most seminal works in this area, where
+the idea behind it is to define a distribution semantics that associates
+probability to a set of \textit{independent} events  in such a way that
+a unique probability measure is induced over all interpretations of
+ground atoms \citep{cozman2020joy}.
+
+\begin{definition}[Probabilistic Fact]
+    A probabilistic fact is a pair consisting of an atom $A$ and
+    a probability value $\alpha$, which we denote by $\alpha ::
+    A$ \citep{cozman2017semantics}.
+
+    Additionally, atoms of probabilistic facts may contain logical
+    variables ($\alpha :: r(X_1, \ldots, X_n)$), and are therefore
+    unground. When considering this case, we interpret such a
+    probabilistic fact as the set of all grounded probabilistic
+    facts, obtained after grounding the variables in the atom.
+
+    Finally, we say that probabilistic facts do not unify with the
+    head of any rule. In other word, there is no substitution $\theta$
+    that makes a probabilistic fact $f$ and a rule head $h$
+    syntactically identical, we do not have $f\theta = h\theta$ for
+    any value of $f$ and $h$.
+\end{definition}
+
+Note that this definition of PLPs only associates probabilities through the use
+of probabilistic facts. Thus, properties from logic programs are also present in
+PLPs, such as \textit{stratification}, \textit{acyclicity}, and
+\textit{definiteness}.
+
+In order to further extend this probabilistic semantics, one may define
+multi-valued scenarios, where probabilities are not of the type
+\mintinline{prolog}{p::a}, where $a$ has probability $p$ of being \emph{true}
+and $(1-p)$ of being \emph{false}; but instead we have a distribution over many
+scenarios $a(1), \ldots, a(k)$, each associated with a probability $p(i)$. This
+notion, called \textit{annotated disjunctions}, extends the previous definition
+of PLPs to Extended Disjunctive Logic Programming (EDLP), by adding
+probabilistic facts to head of rules.
+
+\begin{definition}[Annotated Disjunctive Rules]
+    A probabilistic extension of an EDLP is called
+    Annotated Disjunctive Rules (ADR), a set of rules of the form:
+    \begin{minted}{prolog}
+        p1::a(1); ...; pK::a(K) :- b1, ..., bM, not c1, ..., not cN,
+    \end{minted}
+    where $p_1, \ldots, p_k$ are nonnegative real values
+    whose sum is smaller than or equal to 1. In this sense, a
+    probabilistic fact of the form
+    \begin{minted}{prolog}
+        p::a
+    \end{minted}
+    is a special case (and a syntactic sugar) of an ADR, where
+    \mintinline{prolog}{p::a} is equivalent to
+    \mintinline{prolog}{p::a (1-p):-f}, where $f$ is an atom
+    that is never true \citep{geh2023dpasp}.
+\end{definition}
+
+\subsection{Probabilistic Answer Set Programming}
+
+Although we have briefly defined Sato's distribution semantics,
+there is a need for a more formal description. Furthermore,
+this distribution semantics that Sato proposed is not well
+adapted to consider ASP programs.
+
+It is important to note that we are defining a probability
+distribution over PLPs, and not logical ones. This makes
+probabilistic semantics over PLPs agnostic w.r.t. the
+logical semantics of the program, which is particularly useful
+when considering non-stratified programs that may use a
+\textit{stable model} or \textit{well-founded} semantics
+\citep{eiter2009answer, maua2020complexity}.
+
+\begin{definition}[Probabilistic Choice]
+    A PLP $(P, PF)$ with $n$ probabilistic facts can
+    generate a total of $2^n$ different logic programs: one for
+    each possible assignment of the probabilistic facts (when
+    considering binary probabilistic facts). The assignment of
+    a probabilistic fact $\alpha :: A$ can be seen as choosing
+    to keep or erase the fact $A$ from the program
+    \citep{cozman2017semantics}.
+
+    As commented before, these \textit{probabilistic choices} are
+    assumed to be independent.
+\end{definition}
+
+\begin{definition}[Total Choice]
+    A \textit{total choice} $\theta$ for a PLP $(P, PF)$ is
+    a subset of the set of grounded probabilistic facts. Thus,
+    $\theta$ can be interpreted as a set of ground facts that
+    are probabilistically selected to be included in $P$, while
+    all other ground facts obtained from probabilistic facts are
+    discarded \citep{cozman2017semantics}.
+
+    Because the probabilistic choices are assumed to be
+    independent, the probability of a total choice can be easily
+    computed by the product over the grounded probabilistic
+    facts, where a probabilistic fact $\alpha :: A$ that is
+    chosen to be included contributes with a factor of $\alpha$,
+    and, if it is discarded, it contributes with a factor of
+    $(1-\alpha)$ \citep{cozman2017semantics}.
+
+    An important property of total choices is that, for a total
+    choice $\theta$, the induced logic program (w.r.t. $P$),
+    denoted by $P \cap PF^{\downarrow \theta}$, is a normal
+    logic program \citep{cozman2017semantics, geh2023dpasp}.
+    Therefore, for an ADR, a total choice $\theta$ induces
+    a normal logic program, where each rule $r$ from the
+    ADR is transformed into a rule of the form
+    \begin{minted}{prolog}
+        a_i :- b1, ..., bM, not c1, ..., not cN,
+    \end{minted}
+    where $i$ is the corresponding index of the probabilistic
+    choice in $\theta$ \citep{geh2023dpasp}.
+\end{definition}
+
+Whenever we have a total choice $\theta$ for a PLP such
+that $P \cup PF^{\downarrow \theta}$ is stratified, the
+resulting induced program has only one \textit{stable model}, as
+we can conclude by earlier Subsections \ref{sub:stratification} and
+\ref{sub:stable_model}. Hence, Sato's distribution semantics can be naturally
+extended to this class of programs, and does not create any controversial
+interpretation of the probabilistic semantics.
+
+A more interesting case is when we have a total choice $\theta$
+for a PLP that induces a (non-stratified) logical program
+with multiple \textit{stable models}. In this case, we have the
+need to define semantics capable of handling this situation:
+the Credal and \textsc{MaxEnt} semantics, which we define next.
+
+First, we define the notion of \textit{consistency} for
+PLPs:
+
+\begin{definition}[Consistency of Probabilistic Logic Programs]
+    A PLP $(P, PF)$ is \textit{consistent} if, for each
+    total choice $\theta$, the induced logic program $P \cup
+    PF^{\downarrow \theta}$ has at least one stable model
+    \citep{cozman2017semantics}.
+\end{definition}
+
+Given that we have a definition to express PLPs that are
+able to have stable models, independent of the total choice, we
+are capable of formalizing the notion of a \textit{probability
+model} for PLPs:
+
+\begin{definition}[Probability Model for Probabilistic Logic
+    Programs]
+    A \textit{probability model} for a consistent PLP $(P,
+    PF)$ is a probability measure $\mathbb{P}$ over
+    interpretations of $P$, such that
+    \citep{cozman2017semantics}:
+    \begin{enumerate}
+        \item Every interpretation $I$ with $\mathbb{P}(I) > 0$
+        is a stable model of (the normal logic program) $P \cup
+        PF^{\downarrow \theta}$ w.r.t. the total choice $\theta$
+        that agrees with $I$ on the probabilistic facts; and
+        \item The probability of each total choice $\theta$ is
+        the product of the probabilities for all individual
+        choices in $\theta$:
+        $$\mathbb{P}(\Set{I \mid I \cap C = C}) = \prod_{\alpha
+        :: A | A \in C} \alpha \prod_{\alpha :: A | A \notin C}
+        (1 - \alpha).$$
+    \end{enumerate}
+\end{definition}
+
+\subsubsection{Credal Semantics}
+
+As the first PASP semantics to be described, we introduce
+the \textit{credal semantics}, which is based on the idea of
+using intervals (containing \textit{upper} and \textit{lower})
+to represent the uncertainty of the probability
+\citep{lukasiewicz2005probabilistic,
+lukasiewicz2007probabilistic}.
+
+\begin{definition}[Credal Semantics]
+    The \textit{credal semantics} for a consistent PLP $(P,
+    PF)$ is the set of all probability models for $(P, PF)$
+    \citep{cozman2017semantics}.
+
+    Moreover, the credal semantics is a \textit{closed} and
+    \textit{convex} set of probability measures, and corresponds
+    to the set of all probability measures that dominate an
+    infinitely monotone Choquet capacity
+    \citep{cozman2017semantics} (more about Choquet capacities
+    can be found in \cite{cozman2020joy}). As such, the credal
+    semantics of any set of models $\mathcal{M}$ is
+    characterized by an interval $[\underline{\mathbb{P}}(\mathcal{M}),
+    \overline{\mathbb{P}}(\mathcal{M})]$:
+
+    \begin{equation}
+        \underline{\mathbb{P}}(\mathcal{M}) = \sum_{\theta \in
+        \Theta : \Gamma(\theta) \subseteq \mathcal{M}} \mathbb{P}
+        (\theta), \qquad
+        \overline{\mathbb{P}}(\mathcal{M}) = \sum_{\theta \in \Theta
+        : \Gamma(\theta) \cap \mathcal{M} \ne \emptyset} \mathbb{P}
+        (\theta),
+        \label{eq:credal_semantics}
+    \end{equation}
+
+    \noindent where $\Theta$ is the set of all total choices, and $\Gamma
+    (\theta)$ is the set of stable models associated with the
+    total choice \citep{cozman2017semantics, cozman2020joy}.
+
+    Given a PLP, this interval can be computed for a set
+    of assignments $\mathbf{Q}$ for ground atoms by the
+    following algorithm \citep{cozman2017semantics}:
+
+    \begin{enumerate}
+        \item Given a PLP $(P, PF)$ and $\mathbf{Q}$,
+        initialize variables $a$ and $b$ with 0;
+        \item For each total choice $\theta$, compute the set $S$
+        of all stable models of $P \cap PF^{\downarrow \theta}$,
+        and:
+            \begin{enumerate}
+                \item If $\mathbf{Q}$ is \textit{true} in every
+                stable model in $S$, then $a \leftarrow a + P(
+                \theta)$; and
+                \item If $\mathbf{Q}$ is \textit{true} in some
+                stable model of $S$, then $b \leftarrow b + P(
+                \theta)$.
+            \end{enumerate}
+        \item Return $[a, b]$ as the interval $[\underline{\mathbb{P}}(
+        \mathbf{Q}),\overline{\mathbb{P}}(\mathbf{Q})]$.
+    \end{enumerate}
+
+    An interesting relation between the credal semantics and
+    reasoning over Answer Sets is that the computation of the
+    upper probability, $\overline{\mathbb{P}}(\mathbf{Q})$,
+    involves \textit{brave reasoning}, and the computation of
+    the lower probability, $\underline{\mathbb{P}}(\mathbf{Q})$,
+    involves \textit{cautious reasoning}
+    \citep{cozman2017semantics}.
+\end{definition}
+
+\subsubsection{Maximum-Entropy Semantics}
+
+To conclude this chapter, we define one of the most famous
+semantics for PASP: the \textit{Maximum
+Entropy} semantics, also known as \textsc{MaxEnt} semantics:
+
+\begin{definition}[Maximum Entropy (MaxEnt) Semantics]
+    This semantics is based on the principle of maximum entropy:
+    evenly dividing the probability mass among all stable
+    models of a program (induced by a total choice). Formally,
+    for a stable model $\mathcal{M}$, the probability
+    $\mathbb{P}(\mathcal{M})$ is given by:
+
+    $$\mathbb{P}(\mathcal{M}) = \sum_{\theta : \mathcal{M} \in
+    \Gamma(\theta)} \frac{\mathbb{P}(\theta)}{n},
+    $$
+
+    where $n$ is the number of stable models associated with
+    the total choice $\theta$ \citep{cozman2017semantics}.
+\end{definition}
+
+\subsection{PASP Inference as 2AMC}
+
+By analyzing the definitions of PASP semantics, an immediate observation is that
+they are closely related to the \textit{two-level weighted model counting}
+(2AMC) problem defined in Chapter~\ref{ch:amc}. In fact, both the credal
+semantics and the \textsc{MaxEnt} semantics can be reduced to instances of
+2AMC \citep{kiesel2023knowledge, azzolini2023inference}. In more detail,
+when defining the 2AMC framework, \citep{kiesel2023knowledge} showed that
+the \textsc{MaxEnt} semantics can be directly mapped to a 2AMC instance by
+having an inner model counting problem that counts the number of stable models
+for each total choice, and an outer problem that sums the probabilities of
+these total choices. Similarly, \citep{azzolini2023inference} demonstrated that
+the credal semantics can also be expressed as a 2AMC problem, where the inner
+problem applies \textit{brave}/\textit{cautious} reasoning to verify whether
+the query holds in some/all stable models for each total choice, and the outer
+problem sums the probabilities of these total choices, as a ``standard''
+weighted model counting problem.
+
+%---------------------------------------------------------------
