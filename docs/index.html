@@ -23,7 +23,11 @@
             }
 
             header {
-                background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+                background: linear-gradient(
+                    135deg,
+                    var(--accent),
+                    var(--accent-dark)
+                );
                 color: #fff;
                 padding: 3rem 1rem 2rem;
                 text-align: center;
@@ -56,7 +60,9 @@
                 color: #fff;
                 font-weight: 600;
                 background: rgba(0, 0, 0, 0.25);
-                transition: transform 0.2s ease, background 0.2s ease;
+                transition:
+                    transform 0.2s ease,
+                    background 0.2s ease;
             }
 
             .cta a.primary {
@@ -181,15 +187,30 @@
         <header>
             <h1>Argumentation Mining with Probabilistic ASP</h1>
             <p>
-                Undergraduate thesis by Jonas Rodrigues Lima Gonçalves (IME-USP) exploring
-                knowledge compilation techniques for Probabilistic Answer Set Programming
-                and their application to coherent argument extraction.
+                Undergraduate thesis by Jonas Rodrigues Lima Gonçalves, advised
+                by Prof. Denis Deratani Mauá, at the Institute of Mathematics
+                and Statistics (IME-USP) exploring knowledge compilation
+                techniques for Probabilistic Answer Set Programming and their
+                application to neuro-symbolic argument mining.
             </p>
             <div class="cta">
-                <a class="primary" href="https://raw.githubusercontent.com/jonasrlg/dpasp-argumentation/main/text/template-ime/tese.pdf">Download Thesis (PDF)</a>
-                <a href="https://raw.githubusercontent.com/jonasrlg/dpasp-argumentation/main/text/slides/slides.pdf">Defense Slides</a>
-                <a href="https://github.com/jonasrlg/dpasp-argumentation/blob/main/text/poster/Poster.tex" class="inline-link">Poster Source</a>
-                <a href="https://github.com/jonasrlg/dpasp-argumentation">GitHub Repository</a>
+                <a
+                    class="primary"
+                    href="https://raw.githubusercontent.com/jonasrlg/dpasp-argumentation/main/text/template-ime/tese.pdf"
+                    >Download Thesis (PDF)</a
+                >
+                <a
+                    href="https://raw.githubusercontent.com/jonasrlg/dpasp-argumentation/main/text/slides/slides.pdf"
+                    >Download Slides (PDF)</a
+                >
+                <a
+                    href="https://github.com/jonasrlg/dpasp-argumentation/blob/main/text/poster/Poster.tex"
+                    class="inline-link"
+                    >Poster Source</a
+                >
+                <a href="https://github.com/jonasrlg/dpasp-argumentation"
+                    >GitHub Repository</a
+                >
             </div>
         </header>
 
@@ -197,22 +218,26 @@
             <section>
                 <h2>Abstract</h2>
                 <p>
-                    Argumentation mining seeks structured representations of argumentative
-                    discourse, yet state-of-the-art neural approaches struggle with the
-                    uncertainty and combinatorial constraints inherent to these tasks.
-                    This work investigates Probabilistic Answer Set Programming (PASP) as a
-                    unifying framework that combines the declarative modeling power of ASP
-                    with probabilistic semantics. We replace traditional integer linear
-                    programming coherence modules with a neuro-symbolic PASP pipeline and
-                    study how knowledge compilation can turn PASP programs into differentiable
+                    Argumentation mining seeks structured representations of
+                    argumentative discourse, yet state-of-the-art neural
+                    approaches struggle with the uncertainty and combinatorial
+                    constraints inherent to these tasks. This work investigates
+                    Probabilistic Answer Set Programming (PASP) as a unifying
+                    framework that combines the declarative modeling power of
+                    ASP with probabilistic semantics. We replace traditional
+                    integer linear programming coherence modules with a
+                    neuro-symbolic PASP pipeline and study how knowledge
+                    compilation can turn PASP programs into differentiable
                     circuits that support scalable learning and inference.
                 </p>
                 <p>
-                    By targeting both max-entropy and credal semantics, the thesis shows how
-                    probabilistic circuits enable tractable query answering, gradient-based
-                    optimization, and integration with modern deep-learning toolchains such as
-                    PyTorch and JAX. The resulting approach broadens the expressiveness of
-                    neuro-symbolic argument mining while retaining interpretability.
+                    By targeting both max-entropy and credal semantics, the
+                    thesis shows how probabilistic circuits enable tractable
+                    query answering, gradient-based optimization, and
+                    integration with modern deep-learning toolchains such as
+                    PyTorch and JAX. The resulting approach broadens the
+                    expressiveness of neuro-symbolic argument mining while
+                    retaining interpretability.
                 </p>
                 <div class="keywords">
                     <span>Probabilistic Logic Programming</span>
@@ -227,27 +252,43 @@
                 <h2>Project Materials</h2>
                 <ul class="resource-list">
                     <li>
-                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/content">Thesis manuscript sources</a>
+                        <a
+                            href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/content"
+                            >Thesis manuscript sources</a
+                        >
                         <div class="detail">
-                            Chapters, bibliography, and figures used by the IME-USP thesis template.
+                            Chapters, bibliography, and figures used by the
+                            IME-USP thesis template.
                         </div>
                     </li>
                     <li>
-                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/template-ime">IME-USP thesis template</a>
+                        <a
+                            href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/template-ime"
+                            >IME-USP thesis template</a
+                        >
                         <div class="detail">
-                            Customised LaTeX class files and styles for building the final dissertation (`tese.tex`, `tese.pdf`).
+                            Customised LaTeX class files and styles for building
+                            the final dissertation (`tese.tex`, `tese.pdf`).
                         </div>
                     </li>
                     <li>
-                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/slides">Defense slides</a>
+                        <a
+                            href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/slides"
+                            >Defense slides</a
+                        >
                         <div class="detail">
-                            Beamer presentation (`slides.tex`, `slides.pdf`) detailing the motivation, methodology, and findings.
+                            Beamer presentation (`slides.tex`, `slides.pdf`)
+                            detailing the motivation, methodology, and findings.
                         </div>
                     </li>
                     <li>
-                        <a href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/poster">Poster</a>
+                        <a
+                            href="https://github.com/jonasrlg/dpasp-argumentation/tree/main/text/poster"
+                            >Poster</a
+                        >
                         <div class="detail">
-                            Beamer poster layout (`Poster.tex`) summarizing the knowledge-compilation approach for PASP.
+                            Beamer poster layout (`Poster.tex`) summarizing the
+                            knowledge-compilation approach for PASP.
                         </div>
                     </li>
                 </ul>
@@ -255,7 +296,8 @@
 
             <section>
                 <h2>Repository Structure</h2>
-                <pre class="structure">.
+                <pre class="structure">
+.
 ├── docs/                  # GitHub Pages site (this page)
 │   └── index.html
 └── text/
@@ -264,17 +306,24 @@
     ├── poster/            # Poster source files
     ├── proposal/          # Initial research proposal
     └── template-ime/      # IME-USP thesis template + compiled thesis
-</pre>
+</pre
+                >
                 <p>
-                    Additional resources, build scripts, and auxiliary files are included in their respective directories.
-                    For usage instructions, consult the README in each subdirectory or the
-                    <a class="inline-link" href="https://github.com/jonasrlg/dpasp-argumentation/blob/main/text/template-ime/README.md">template guide</a>.
+                    Additional resources, build scripts, and auxiliary files are
+                    included in their respective directories. For usage
+                    instructions, consult the README in each subdirectory or the
+                    <a
+                        class="inline-link"
+                        href="https://github.com/jonasrlg/dpasp-argumentation/blob/main/text/template-ime/README.md"
+                        >template guide</a
+                    >.
                 </p>
             </section>
         </main>
 
         <footer>
-            &copy; 2025 Jonas Rodrigues Lima Gonçalves &middot; Institute of Mathematics and Statistics — University of São Paulo
+            &copy; 2025 Jonas Rodrigues Lima Gonçalves &middot; Institute of
+            Mathematics and Statistics — University of São Paulo
         </footer>
     </body>
 </html>
