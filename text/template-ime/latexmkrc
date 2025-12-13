@@ -17,7 +17,7 @@
 
 
 # Compilação forçando a versão do pdf para 1.7 com a package bxpdfver
-set_tex_cmds('-synctex=1 -halt-on-error -jobname=%A %O %P');
+set_tex_cmds('-synctex=1 -halt-on-error -shell-escape -jobname=%A %O %P');
 $pre_tex_code = '\RequirePackage[1.7]{bxpdfver}';
 
 

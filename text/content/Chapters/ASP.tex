@@ -71,6 +71,31 @@ complexity perspective: deciding satisfiability for propositional (Horn) program
 is $P$-complete, yet it admits linear-time algorithms
 \citep{dowling1984linear}.
 
+\subsection{Normal Logic Programs}
+
+% Even though definite programs (Prolog without negation) are
+% capable of representing a wide range of problems, their
+% limitation with respect to not using negation makes it difficult, if
+% not impossible, to represent some problems that require non-monotonic
+% reasoning \citep{eiter2009answer, brachman2004knowledge}. To
+% overcome this limitation,
+%
+Now, we introduce the concept of programs that include negation in their
+\textit{body} rules, called Normal:
+
+\begin{definition}[Normal Logic Program]
+    A Normal Logic Program is a finite set of rules of the form:
+    \begin{lstlisting}
+        a :- b1, ..., bM, not c1, ..., not cN.
+    \end{lstlisting}
+    where $M, N \geq 0$; $a, b_i, c_i$ are atoms of a function-
+    free First Order Logic (FOL); and \textsc{not c} represents the negation as
+    failure of an atom $c$ ($\neg c$). We also introduce the
+    terminology of \textit{subgoals} in the body, which are either
+    atoms of the form $b_i$ (also called \textit{positive subgoals})
+    or $not \ c_i$ (\textit{negative subgoals}).
+\end{definition}
+
 \subsection{Herbrand Universe, Base and Interpretation}
 
 To reason about the complexity of logic programs we need additional vocabulary.
@@ -210,6 +235,225 @@ models \citep{lin2004assat}. One problem with this approach is
 that the number of loop formulas must be controlled in some
 way, because there can be an exponential number of loop formulas
 for a given program \citep{eiter2009answer}.
+
+\subsection{Immediate Consequence Operator}
+
+To establish the semantics of normal logic programs, we define the
+notion of the \textit{immediate consequence operator} $T_P$:
+
+\begin{definition}[$T_P$ Operator]
+    Let $P$ be a Normal Logic Program. The immediate consequence
+    $T_P: 2^{HB(P)} \rightarrow 2^{HB(P)}$ of a set of ground
+    atoms $I$ is defined as:
+
+    \begin{displaymath}
+        T_P(I) = \Set{ a \ | \begin{array}{l}
+            \text{\prologinline{a :- b1, ..., bM, not c1, ..., cN}}
+            \in ground(P),\\
+            \text{such that } \{b_1, \ldots, b_M\} \subseteq I
+            \text{ and } \{c_1, \ldots, c_N\} \cap I = \emptyset
+            \end{array}},
+    \end{displaymath}
+    where $ground(P)$ denotes the set of all ground atoms in $P$.
+
+    The most important property of the immediate consequence
+    operator is that it is \textit{monotone}
+    \citep{bogaerts2015knowledge} and thus, by the Knaster-Tarki
+    Theorem, has a least fixed point, called $lfp(T_P)$, which is
+    the least model of $P$ \citep{eiter2009answer}. Moreover, the
+    sequence obtained by iterating $T_P$ starting from the empty set
+    converges to the fixed point $lfp(T_P)$.
+\end{definition}
+
+\subsection{Negation and Stratification}
+\label{sub:stratification}
+
+Even though different classes of Logic Programs, such as Definite
+and Normal programs, try to capture the intrinsic duality of
+expressiveness versus efficiency in the field of KR and
+LPs, these definitions only take into account the different
+types of rules that can be present in a program, but not their
+structure.
+
+However, understanding the impact of the negation operator's
+introduction to program rules is of utmost importance, as it
+directly creates the possibility of having a collection
+of multiple minimal models. This change creates the necessity of
+defining a proper semantic for attributing meaning to negation
+in logic problems, where there are two main approaches:
+
+\begin{itemize}
+    \item Define a single model for a program, which possibly
+    tries to capture problematic classes of programs due to
+    negation possibly creating multiple minimal models. This
+    approach has success when dealing with \textit{stratified}
+    programs, which we define later. For general normal
+    programs, the most popular semantics following this approach
+    is based on the \textit{well-founded semantics} (that we
+    do not define here for the sake of brevity)
+    \citep{eiter2009answer, van1991well}.
+    \item Define a collection of models for a program,
+    abandoning the necessity of only one model. This approach
+    gives rise to ASP and its semantics, such as the
+    \textit{stable model semantics}, which we also define later.
+\end{itemize}
+
+One possible way of determining whether a program is
+\textit{stratified} or not is by finding an ordering for the
+evaluation of its rules, such that the value of negative
+literals can be predicted by the values of positive literals
+\citep{eiter2009answer}. But we can also define a more general
+approach by analyzing the structure of the program, that is,
+the dependency graph:
+
+\begin{definition}[Dependency Graph]
+    Let $P$ be a ground program. Then, its dependency (multi) graph
+    $dep(P)$ is a tuple of the form $(V, E)$, where
+    \begin{itemize}
+        \item A set of nodes $V$, where each node $v \in V$ is
+        a ground atom occurring in $P$; and
+        \item A set of edges $E$, where each edge $(v, w) \in E$
+        ($v$ pointing to $w$, $v \rightarrow w$) occurs if and
+        only if $v$ is the head atom of a rule whose body contains
+        a literal $w$. If the literal is negative, then the edge is
+        marked as $*(v, w)$ ($v \rightarrow^* w$).
+    \end{itemize}
+
+    We call a graph \textit{acyclic} if its grounded dependency graph
+    does not contain any (directed) cycles.
+\end{definition}
+
+By utilizing the notion of a dependency graph, we can define the
+concept of stratification:
+
+\begin{definition}[Stratification]
+    Let $P$ be a logic program, and let $G = (V, E)$ be its
+    dependency graph. A stratification of $P$ is a partition
+    $\Sigma = \Set{S_i \mid i \in \Set{1, \ldots, n}}$ of the
+    predicates of $P$ into $n$ non-empty pairwise disjoint
+    sets, such that:
+    \begin{enumerate}
+        \item If $v \in S_i$, $w \in S_j$, and $(v, w) \in E$,
+        then $i \le j$ (positive dependency must be within the
+        same stratum or to a higher/later stratum); and
+        \item If $v \in S_i$ and $*(v, w) \in E$, then $i > j$
+        (negative dependency must be to a strictly lower/earlier
+        stratum).
+    \end{enumerate}
+
+    A program is called \textit{stratified} if it has some
+    stratification $\Sigma$, and its respective partitions $S_i$
+    are called \textit{strata}.
+\end{definition}
+
+\subsection{Stable Model Semantics}
+\label{sub:stable_model}
+
+As stated before, Normal Logic Programs can have multiple minimal models,
+which is a consequence of the introduction of negation in the
+program rules. Following, we have a program where the
+introduction of negation creates multiple minimal models:
+
+\begin{example}
+    Let $P$ be the following logic program:
+    \begin{lstlisting}
+        researcher(computability).
+        machine(X) :- researcher(X), not lambda(X).
+        lambda(X) :- researcher(X), not machine(X).
+    \end{lstlisting}
+
+    Then, note that the program $P$ is not stratified.
+    Furthermore, there is not only one minimal model for $P$,
+    but two:
+    \begin{enumerate}
+        \item $M_1 = \Set{researcher(computability),
+        machine(computability)}$; and
+        \item $M_2 = \Set{researcher(computability),
+        lambda(computability)}$.
+    \end{enumerate}
+\end{example}
+
+Hence, to attribute meaning to negation, we first introduce the
+concept of \textit{reduction} of a program, and then introduce
+one of the most important semantics for logic programs, the
+Stable Model semantics.
+
+\begin{definition}[Reduct (short GL-reduct)]
+    Let $P$ be a Normal Logic Program and $I$ be an interpretation.
+    Then, the \textit{reduct} of $P$ w.r.t $I$, denoted $P^I$,
+    is obtained by:
+
+    \begin{enumerate}
+        \item Grounding the program $P$;
+        \item Removing rules with $not c$ in the body, for each
+        $c \in I$; and
+        \item Removing all negative literals $not c$ from the
+        remaining rules.
+    \end{enumerate}
+\end{definition}
+
+Hence, a Gelfond-Lifschitz reduction produces a program that
+enforces the truth of the atoms in the interpretation $I$. The
+first condition, when a literal $c \in I$, makes the negative
+subgoal $not c$ false. Consequently, any ground rule containing
+$not c$ in its body is removed, as its body cannot be satisfied,
+and it will not contribute to the least model. When the second
+condition occurs, if a literal $c \notin I$, it is possible to
+assume that $not c$ is indeed true; therefore, it can be removed
+from the (body of the) rule.
+
+A direct consequence of the definition of the reduct is that
+the reduction product, $P^I$, is a positive program. Using this
+property, it is easy to see that $P^I$ has a least model
+$LM(P^I)$; and, if $P^I$ is consistent (if it does not present a
+contradiction), then the least model of $P^I$ is $I$ itself. This
+bijective relation between $P^I$ and $I$, of one being able to
+obtain $I$ from $P^I$ due to it being a least model of the
+program, and $P^I$ being the reduct of $P$ w.r.t. $I$, is the
+basis of the Stable Model semantics:
+
+\begin{definition}[Stable Model]
+    Let $P$ be a normal logic ground program. An interpretation
+    $I$ is a stable model of $P$ if $I$ is a minimal model of
+    the reduct $P^I$ of $P$ w.r.t. $I$.
+\end{definition}
+
+Since a normal program may have several stable models, it is
+possible to have multiple interpretations that are stable
+models. Therefore, a normal program may have several stable
+models (or even none, as we stated earlier). For instance, the
+example above has two stable models, $M_1$ and $M_2$.
+
+An interesting property of stable models is that they are fixed
+points of the immediate consequence operator $T_P$. Formally, a
+stable model $I$ of $P$ satisfies $T_P(I) = I$ (but the converse
+is not necessarily true) \citep{eiter2009answer}.
+
+In the context of this work, we will call stable models
+\textbf{\textit{answer sets}}. Usually, we call the stable models
+of a program $P$ \textit{answer sets} when we are talking about
+Extended Logic Programs (ELP), which can contain \textit{strongly
+negated} atoms, but we do not define these ELPs, and instead
+recommend the reader to refer to \citep{eiter2009answer}.
+
+\subsection{Reasoning}
+
+There are three types of reasoning with logic programs under the
+stable model semantics. We enumerate them in order of
+complexity, where the former can be reduced as an instance of
+the latter:
+
+\begin{enumerate}
+    \item \textbf{Consistency} (Satisfiability): decide whether a
+    program has at least one answer set (consistent);
+    \item \textbf{Brave reasoning}: given a ground literal $Q$,
+    decide whether some (at least one) answer set satisfies $Q$.
+    If it does, $Q$ is called a \textit{brave consequence} of the
+    program; and
+    \item \textbf{Cautious reasoning}: given a ground literal
+    $Q$, decide whether all answer sets satisfy $Q$. If all of
+    them do, $Q$ is called a \textit{cautious consequence}.
+\end{enumerate}
 
 \section{Answer Set Programming} \label{sec:asp}
 
@@ -463,7 +707,7 @@ when considering non-stratified programs that may use a
 Whenever we have a total choice $\theta$ for a PLP such
 that $P \cup PF^{\downarrow \theta}$ is stratified, the
 resulting induced program has only one \textit{stable model}, as
-we can conclude by earlier Subsections \ref{sub:stratification} and
+we can conclude by earlier subsections, particularly
 \ref{sub:stable_model}. Hence, Sato's distribution semantics can be naturally
 extended to this class of programs, and does not create any controversial
 interpretation of the probabilistic semantics.
@@ -540,7 +784,7 @@ lukasiewicz2007probabilistic}.
         \overline{\mathbb{P}}(\mathcal{M}) = \sum_{\theta \in \Theta
         : \Gamma(\theta) \cap \mathcal{M} \ne \emptyset} \mathbb{P}
         (\theta),
-        \label{eq:credal_semantics}
+        \label{eq:credal_semantics_asp}
     \end{equation}
 
     \noindent where $\Theta$ is the set of all total choices, and $\Gamma
