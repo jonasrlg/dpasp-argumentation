@@ -349,35 +349,116 @@ when considering the complexity of exact neuro-symbolic inference).
 
 \paragraph{Program listing.} The generator produces instantiations of the
 following ungrounded PASP template, which encodes argumentation constraints
-before grounding:
+before grounding (Listing~\ref{lst:ungrounded_pasp_1} and Listing~\ref{lst:ungrounded_pasp_2}):
 
+\begin{listing}[ht]
 \begin{minted}[fontsize=\small,breaklines]{prolog}
-% Domain and probabilistic choices over components
-node(ARG) :- argument(ARG).
-0.5::aux_component(ARG,0) :- node(ARG).
-0.5::aux_component(ARG,1) :- node(ARG).
+% Annotated disjunctions defining component types, where component(ARG,TYPE)
+%   TYPE = 0: Premise
+%   TYPE = 1: Claim
+%   TYPE = 2: Major Claim
+0.5::component(ARG,0); 0.25::component(ARG,1); 0.25::component(ARG,2) :- node(ARG).
 
-component(ARG,0) :- aux_component(ARG,0).
-component(ARG,1) :- aux_component(ARG,1), not aux_component(ARG,0).
-component(ARG,2) :- node(ARG), not aux_component(ARG,1), not aux_component(ARG,0).
-
-% Probabilistic relations between distinct arguments
+% Relationship between components
 0.5::relation(SRC,DST) :- node(SRC), node(DST), SRC != DST.
 
-% Stratification constraints
+% Rules for the relations
+%
+% Major Claims are never the source of relations
 fail :- node(SRC), node(DST), SRC != DST, component(SRC,2), not relation(SRC,DST).
+% Claims can only relate to Major Claims
 fail :- node(SRC), node(DST), SRC != DST, component(SRC,1), not component(DST,2), not relation(SRC,DST).
+% Premises cannot be the source of Major Claims
 fail :- node(SRC), node(DST), SRC != DST, component(SRC,0), component(DST,2), not relation(SRC,DST).
 \end{minted}
+\caption{Stratified (simplified) PASP program for argumentation constraints.}
+\label{lst:ungrounded_pasp_1}
+\end{listing}
+
+\begin{listing}[ht]
+\begin{minted}[fontsize=\small,breaklines]{prolog}
+% 1. Component Assignment (Annotated Disjunction)
+% component(ARG, TYPE):
+%   TYPE = 0: None (No component selected)
+%   TYPE = 1: Premise
+%   TYPE = 2: Claim
+%   TYPE = 3: Major Claim
+0.25::component(X, 0); 0.25::component(X, 1); 0.15::component(X, 2); 0.75::component(X, 3) :- node(X).
+
+% 2. Relation Assignment (Annotated Disjunction)
+% relation(SRC, DST, TYPE):
+%   TYPE = 0: None (No relation)
+%   TYPE = 1: Support Attack (Used for 'Support' logic)
+%   TYPE = 2: Attack (Used for 'Attack' logic)
+0.33::relation(SRC, DST, 0); 0.33::relation(SRC, DST, 1); 0.33::relation(SRC, DST, 2) :- node(SRC), node(DST), SRC != DST.
+
+% --- Structural Constraints (Fail-Based Pruning) ---
+% These rules prune models that violate the desired graph structure based on component types.
+% We use 'not relation(SRC,DST,0)' as a shorthand for 'a relation exists' between SRC and DST.
+
+% Structural Rule 1: Claims cannot relate to other Claims.
+fail :- node(SRC), node(DST), SRC != DST, component(SRC, 2), component(DST, 2), not relation(SRC, DST, 0).
+% Structural Rule 2: Major Claims cannot be the source of relations to Claims.
+fail :- node(SRC), node(DST), SRC != DST, component(SRC, 3), component(DST, 2), not relation(SRC, DST, 0).
+% Structural Rule 3: Claims cannot be the source of relations to Premises.
+fail :- node(SRC), node(DST), SRC != DST, component(SRC, 2), component(DST, 1), not relation(SRC, DST, 0).
+% Structural Rule 4: Major Claims cannot be the source of relations to Premises.
+fail :- node(SRC), node(DST), SRC != DST, component(SRC, 3), component(DST, 1), not relation(SRC, DST, 0).
+
+% --- Acceptability and MDQ Machinery (Generalized Rules) ---
+
+% hasRelation(X, Y) is true if a non-zero relation exists and the structural constraints are satisfied (implicitly by 'fail' rules).
+hasRelation(X, Y) :- relation(X, Y, 1).
+hasRelation(X, Y) :- relation(X, Y, 2).
+
+% Incoming relations act as a first notion of acceptability
+hasIncomingRelation(X) :- hasRelation(Y, X).
+% Acceptability is determined by the absence of incoming relations
+acceptable(X) :- node(X), not hasIncomingRelation(X).
+
+% Intermediate steps for acceptability
+% A support is "not_supports" if the supporter is NOT acceptable.
+not_supports(X, Y) :- node(X), node(Y), relation(X, Y, 1), hasRelation(X, Y), not acceptable(X).
+% An attack is "effective" if the attacker IS acceptable.
+effectiveAttacks(X, Y) :- node(X), node(Y), relation(X, Y, 2), hasRelation(X, Y), acceptable(X).
+
+% hasSupport: there exists an acceptable supporter Y that supports X
+% Note: Using not/1 for existence check.
+% absenceSupport(X) is true if there is ANY supporter Y whose support is NOT effective (i.e., not_supports(Y,X) is true).
+absenceSupport(X) :- not_supports(Y, X), node(Y), node(X).
+hasSupport(X) :- node(X), relation(Y, X, 1), not absenceSupport(X).
+
+% acceptable(X) is true if it has support (from acceptable arguments) AND is not attacked by an acceptable argument.
+attackedByAcceptable(X) :- effectiveAttacks(Y, X).
+acceptable(X) :- node(X), hasSupport(X), not attackedByAcceptable(X).
+
+% Initial Acceptability (Base case for recursion, if needed/desired)
+% This part is often necessary in simpler frameworks, but the recursive definition handles it if the graph is properly built.
+% acceptable(X) :- node(X), not hasIncoming(X).
+
+% MDQ (Maximum Degree Quality)
+% hasMC: there is at least one Major Claim (component(...,3))
+hasMC :- component(X, 3), node(X).
+% not_justified(X): A Major Claim is not acceptable
+not_justified(X) :- node(X), component(X, 3), not acceptable(X).
+% exists_not_justified: There is at least one Major Claim that is not acceptable
+exists_not_justified :- not_justified(X).
+% mdq: There is a Major Claim AND no Major Claim is unjustified
+mdq :- hasMC, not exists_not_justified.
+\end{minted}
+\caption{Non-stratified PASP program for argumentation constraints.}
+\label{lst:ungrounded_pasp_2}
+\end{listing}
 
 \paragraph{Grounding.} The grounding step instantiates the above program over a
-set of arguments provided as input. For an input size of $n$ arguments, the
-grounded program contains $3n$ probabilistic facts for the components and
-$n(n-1)/2$ probabilistic facts for the relations, resulting in a total of
-$3n + n(n-1)/2$ probabilistic facts. Note that the number of rules in the
-grounded program grows quadratically with $n$ due to the pairwise relations
-between arguments. In order to compute such groundings, we use \emph{clingo},
-the state-of-the-art ASP grounder \citep{gebser2014clingo}.
+set of arguments provided as input. For an input size of $n$ arguments over
+Listing~\ref{lst:ungrounded_pasp_1}, the grounded program contains $3n$
+probabilistic facts for the components and $n(n-1)/2$ probabilistic facts for
+the relations, resulting in a total of $3n + n(n-1)/2$ probabilistic facts. Note
+that the number of rules in the grounded program grows quadratically with $n$
+due to the pairwise relations between arguments. In order to compute such
+groundings, we use \emph{clingo}, the state-of-the-art ASP grounder
+\citep{gebser2014clingo}.
 
 \paragraph{Knowledge compilation.} Given the grounded program, we apply Clark's
 completion and generate the corresponding CNF with loop formulas, by following
