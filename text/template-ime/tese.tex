@@ -48,7 +48,17 @@
 % também define os comandos para capa, folha de rosto etc.
 \usepackage{imegoodies}
 \usepackage[thesis]{imelooks}
-\usepackage{minted}
+\usepackage[newfloat]{minted}
+\makeatletter
+\AtBeginDocument{%
+  \@ifundefined{listingscaption}{}{%
+    \renewcommand{\listingscaption}{\lstlistingname}%
+  }%
+  \@ifundefined{listoflistingscaption}{}{%
+    \renewcommand{\listoflistingscaption}{\programlistname}%
+  }%
+}
+\makeatother
 \usetikzlibrary{arrows.meta}
 
 %\nocolorlinks % para impressão em P&B
@@ -385,12 +395,10 @@
 \listoftables
 %\disablenewpage{\listoftables}
 
-% Esta lista é criada "automaticamente" pela package float quando
-% definimos o novo tipo de float "program" (em utils.tex)
+% Esta lista é criada automaticamente para os floats do tipo "listing"
 % Você pode escolher se quer ou não permitir a quebra de página
-%\listof{program}{\programlistname}
 \clearpage
-\disablenewpage{\listof{program}{\programlistname}}
+\disablenewpage{\listoflistings}
 
 % Sumário (obrigatório)
 \tableofcontents

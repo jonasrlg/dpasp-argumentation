@@ -1,6 +1,7 @@
 modelo-latex/
 .aider*
 .env
+*.lol
 *.log
 *.out
 *.bcf

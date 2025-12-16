@@ -531,23 +531,26 @@ into end-to-end learning pipelines, even when using compilers other than
 
 \begin{table}[ht]
     \centering
-    \begin{tabular}{lcccccc}
+    \begin{tabular}{lllllll}
         \toprule
         \# Nodes & \multicolumn{2}{c}{\textsc{C2D}} & \multicolumn{2}{c}{\textsc{D4}} & \multicolumn{2}{c}{\textsc{SharpSAT-TD}} \\
         \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-        & Size & Time & Size & Time & Size & Time \\
+        & Size & Time (s) & Size & Time (s) & Size & Time (s)\\
         \midrule
-        1 & 107 & 0.001 & 99 & 0.00014 & 160 & 0.001225 \\
-        2 & 2555 & 0.002 & 2736 & 0.00105 & 1637 & 0.003164 \\
-        3 & 170844 & 0.044 & 123025 & 0.04816 & 88729 & 0.016818 \\
-        4 & 101566925 & 37.9 & 6183424 & 3.96765 & 2057170 & 0.264196 \\
-        5 & - & - & - & - & 21386450 & 2.93743 \\
-        6 & - & - & - & - & 436225040 & 65.4520 \\
+        1 & 107 & 0.001 & \textbf{99} & \textbf{0.00014} & 160 & 0.001225 \\
+        2 & 2555 & 0.002 & 2736 & \textbf{0.00105} & \textbf{1637} & 0.003164 \\
+        3 & 170844 & 0.044 & 123025 & 0.04816 & \textbf{88729} & \textbf{0.016818} \\
+        4 & 101566925 & 37.9 & 6183424 & 3.96765 & \textbf{2057170} & \textbf{0.264196} \\
+        5 & - & - & - & - & \textbf{21386450} & \textbf{2.93743} \\
+        6 & - & - & - & - & \textbf{436225040} & \textbf{65.4520} \\
         \bottomrule
     \end{tabular}
     \caption{Comparison of top-down compilers over Listing~\ref{lst:ungrounded_pasp_2}.
     The table compares circuit size (number of nodes plus edges) and compilation time
-    (in seconds) for \textsc{C2D}, \textsc{D4}, and \textsc{SharpSAT-TD}.}
+    (in seconds) for \textsc{C2D}, \textsc{D4}, and \textsc{SharpSAT-TD}. The best
+    results for each row are highlighted in bold. A dash (-) indicates that the
+    compiler was unable to complete the compilation within a reasonable time frame
+    (30 minutes) or ran out of memory.}
     \label{tab:comparison}
 \end{table}
 
