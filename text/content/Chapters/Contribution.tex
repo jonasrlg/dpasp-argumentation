@@ -377,66 +377,37 @@ fail :- node(SRC), node(DST), SRC != DST, component(SRC,0), component(DST,2), no
 
 \begin{listing}[ht]
 \begin{minted}[fontsize=\small,breaklines]{prolog}
-% 1. Component Assignment (Annotated Disjunction)
-% component(ARG, TYPE):
-%   TYPE = 0: None (No component selected)
-%   TYPE = 1: Premise
-%   TYPE = 2: Claim
-%   TYPE = 3: Major Claim
-0.25::component(X, 0); 0.25::component(X, 1); 0.15::component(X, 2); 0.75::component(X, 3) :- node(X).
-
-% 2. Relation Assignment (Annotated Disjunction)
-% relation(SRC, DST, TYPE):
-%   TYPE = 0: None (No relation)
-%   TYPE = 1: Support Attack (Used for 'Support' logic)
-%   TYPE = 2: Attack (Used for 'Attack' logic)
+% 1. Component Estimation, where TYPE in component(X, TYPE) denotes:
+%   0: None / 1: Premise / 2: Claim / 3: Major Claim
+0.25::component(X, 0); 0.25::component(X, 1); 0.15::component(X, 2); 0.35::component(X, 3) :- node(X).
+% 2. Relationship Prediction, where TYPE in relation(SRC, DST, TYPE) denotes:
+%   0: None / 1: Support / 2: Attack
 0.33::relation(SRC, DST, 0); 0.33::relation(SRC, DST, 1); 0.33::relation(SRC, DST, 2) :- node(SRC), node(DST), SRC != DST.
-
 % --- Structural Constraints (Fail-Based Pruning) ---
-% These rules prune models that violate the desired graph structure based on component types.
-% We use 'not relation(SRC,DST,0)' as a shorthand for 'a relation exists' between SRC and DST.
-
 % Structural Rule 1: Claims cannot relate to other Claims.
 fail :- node(SRC), node(DST), SRC != DST, component(SRC, 2), component(DST, 2), not relation(SRC, DST, 0).
-% Structural Rule 2: Major Claims cannot be the source of relations to Claims.
+% Structural Rule 2: Major Claims cannot be the source to Claims.
 fail :- node(SRC), node(DST), SRC != DST, component(SRC, 3), component(DST, 2), not relation(SRC, DST, 0).
-% Structural Rule 3: Claims cannot be the source of relations to Premises.
+% Structural Rule 3: Claims cannot be the source to Premises.
 fail :- node(SRC), node(DST), SRC != DST, component(SRC, 2), component(DST, 1), not relation(SRC, DST, 0).
-% Structural Rule 4: Major Claims cannot be the source of relations to Premises.
+% Structural Rule 4: Major Claims cannot be the source to Premises.
 fail :- node(SRC), node(DST), SRC != DST, component(SRC, 3), component(DST, 1), not relation(SRC, DST, 0).
-
 % --- Acceptability and MDQ Machinery (Generalized Rules) ---
-
-% hasRelation(X, Y) is true if a non-zero relation exists and the structural constraints are satisfied (implicitly by 'fail' rules).
 hasRelation(X, Y) :- relation(X, Y, 1).
 hasRelation(X, Y) :- relation(X, Y, 2).
-
-% Incoming relations act as a first notion of acceptability
 hasIncomingRelation(X) :- hasRelation(Y, X).
 % Acceptability is determined by the absence of incoming relations
 acceptable(X) :- node(X), not hasIncomingRelation(X).
-
-% Intermediate steps for acceptability
 % A support is "not_supports" if the supporter is NOT acceptable.
 not_supports(X, Y) :- node(X), node(Y), relation(X, Y, 1), hasRelation(X, Y), not acceptable(X).
 % An attack is "effective" if the attacker IS acceptable.
 effectiveAttacks(X, Y) :- node(X), node(Y), relation(X, Y, 2), hasRelation(X, Y), acceptable(X).
-
-% hasSupport: there exists an acceptable supporter Y that supports X
-% Note: Using not/1 for existence check.
-% absenceSupport(X) is true if there is ANY supporter Y whose support is NOT effective (i.e., not_supports(Y,X) is true).
+% absenceSupport is true if there is ANY supporter whose support is NOT effective
 absenceSupport(X) :- not_supports(Y, X), node(Y), node(X).
 hasSupport(X) :- node(X), relation(Y, X, 1), not absenceSupport(X).
-
-% acceptable(X) is true if it has support (from acceptable arguments) AND is not attacked by an acceptable argument.
+% acceptable is true if it has support AND is not attacked by an acceptable argument.
 attackedByAcceptable(X) :- effectiveAttacks(Y, X).
 acceptable(X) :- node(X), hasSupport(X), not attackedByAcceptable(X).
-
-% Initial Acceptability (Base case for recursion, if needed/desired)
-% This part is often necessary in simpler frameworks, but the recursive definition handles it if the graph is properly built.
-% acceptable(X) :- node(X), not hasIncoming(X).
-
-% MDQ (Maximum Degree Quality)
 % hasMC: there is at least one Major Claim (component(...,3))
 hasMC :- component(X, 3), node(X).
 % not_justified(X): A Major Claim is not acceptable
@@ -519,7 +490,7 @@ template.
     \centering
     \begin{subfigure}{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{content/gfx/argumentation_stratified_scatter.pdf}
+        \includegraphics[width=\linewidth]{argumentation_stratified_scatter.pdf}
         \caption{Scatter plot comparing circuit size (number of nodes plus edges) for top-down
         compilers over Listing~\ref{lst:ungrounded_pasp_1}.}
         \label{fig:scatter_circuit_size}
@@ -527,7 +498,7 @@ template.
     \hfill
     \begin{subfigure}{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{content/gfx/argumentation_stratified_time.pdf}
+        \includegraphics[width=\linewidth]{argumentation_stratified_time.pdf}
         \caption{Scatter plot comparing compilation time (in seconds) for top-down compilers
         over Listing~\ref{lst:ungrounded_pasp_1}.}
         \label{fig:scatter_compilation_time}
@@ -558,46 +529,23 @@ into end-to-end learning pipelines, even when using compilers other than
 
 \begin{table}[ht]
     \centering
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \begin{tabular}{llll}
-            \toprule
-            \# Nodes & \textsc{C2D} & \textsc{D4} & \textsc{SharpSAT-TD} \\
-            program &  &  &  \\
-            \midrule
-            1 & 107 & 99 & 160 \\
-            2 & 2555 & 2736 & 1637 \\
-            3 & 170844 & 123025 & 88729 \\
-            4 & 101566925 & 6183424 & 2057170 \\
-            5 & - & - & 21386450 \\
-            6 & - & - & 436225040 \\
-            \bottomrule
-        \end{tabular}
-        \caption*{Circuit Size (Number of Nodes + Edges)}
-        \label{tab:circuit_size}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \begin{tabular}{llll}
-            \toprule
-            \# Nodes & \textsc{C2D} & \textsc{D4} & \textsc{SharpSAT-TD} \\
-            program &  &  &  \\
-            \midrule
-            1 & 0.001 & 0.00014 & 0.001225 \\
-            2 & 0.002 & 0.00105 & 0.003164 \\
-            3 & 0.044 & 0.04816 & 0.016818 \\
-            4 & 37.9 & 3.96765 & 0.264196 \\
-            5 & - & - & 2.93743 \\
-            6 & - & - & 65.4520 \\
-            \bottomrule
-        \end{tabular}
-        \caption*{Compilation Time (Seconds)}
-        \label{tab:compilation_time}
-    \end{minipage}
-    \caption{Comparison of top-down compilers over Listing \ref{lst:ungrounded_pasp_2}.
-    On the left, we have a table comparing circuit size (number of nodes plus edges);
-    on the right, compilation time (in seconds).}
+    \begin{tabular}{lcccccc}
+        \toprule
+        \# Nodes & \multicolumn{2}{c}{\textsc{C2D}} & \multicolumn{2}{c}{\textsc{D4}} & \multicolumn{2}{c}{\textsc{SharpSAT-TD}} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+        & Size & Time & Size & Time & Size & Time \\
+        \midrule
+        1 & 107 & 0.001 & 99 & 0.00014 & 160 & 0.001225 \\
+        2 & 2555 & 0.002 & 2736 & 0.00105 & 1637 & 0.003164 \\
+        3 & 170844 & 0.044 & 123025 & 0.04816 & 88729 & 0.016818 \\
+        4 & 101566925 & 37.9 & 6183424 & 3.96765 & 2057170 & 0.264196 \\
+        5 & - & - & - & - & 21386450 & 2.93743 \\
+        6 & - & - & - & - & 436225040 & 65.4520 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of top-down compilers over Listing~\ref{lst:ungrounded_pasp_2}.
+    The table compares circuit size (number of nodes plus edges) and compilation time
+    (in seconds) for \textsc{C2D}, \textsc{D4}, and \textsc{SharpSAT-TD}.}
     \label{tab:comparison}
 \end{table}
 
@@ -608,7 +556,7 @@ our work. Unlike the stratified program in Listing~\ref{lst:ungrounded_pasp_1}, 
 non-stratified program introduces significantly more complex probabilistic-logical
 knowledge and constraints, leading to exponential blow-ups in both circuit size and
 compilation time, even for small instance sizes, which can be easily observed in
-Tables~\ref{tab:circuit_size} and~\ref{tab:compilation_time}.
+Table~\ref{tab:comparison}.
 
 For instance, while stratified programs remain manageable across all compilers, the
 non-stratified program quickly becomes infeasible for \textsc{C2D} and \textsc{D4} as
