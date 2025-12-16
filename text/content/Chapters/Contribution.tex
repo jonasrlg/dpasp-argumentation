@@ -515,5 +515,104 @@ template.
 \subsection{Empirical Analysis}
 \label{subsec:empirical-analysis}
 
-Still pending (results are stored in my desktop and the energy crysis is
-delaying acess to the CSVs containing the data).
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{content/gfx/argumentation_stratified_scatter.pdf}
+        \caption{Scatter plot comparing circuit size (number of nodes plus edges) for top-down
+        compilers over Listing~\ref{lst:ungrounded_pasp_1}.}
+        \label{fig:scatter_circuit_size}
+    \end{subfigure}%
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{content/gfx/argumentation_stratified_time.pdf}
+        \caption{Scatter plot comparing compilation time (in seconds) for top-down compilers
+        over Listing~\ref{lst:ungrounded_pasp_1}.}
+        \label{fig:scatter_compilation_time}
+    \end{subfigure}
+    \caption{Comparison of top-down compilers over Listing~\ref{lst:ungrounded_pasp_1}.
+    The left subfigure shows circuit size (number of nodes plus edges), while the right
+    subfigure shows compilation time (in seconds).  Larger dots represent larger values
+    on the y-axis.}
+    \label{fig:scatter_comparison}
+\end{figure}
+
+The experiments in Figure~\ref{fig:scatter_comparison} demonstrate that, for the PASP
+program in Listing~\ref{lst:ungrounded_pasp_1}, the \textsc{D4} compiler outperformed
+the other compilers in both compilation time and circuit size.
+This makes D4 a compelling choice for the stratified argumentation mining
+instances considered in this work. The decision to limit the evaluation
+to argumentation graphs with up to $50$ nodes stems from the fact that the
+datasets currently of interest to our research group contain graphs with at
+most half this size.
+
+It is worth noting, however, that while \textsc{D4} was the most efficient in
+this setting, the other compilers also produced compact circuits. This is
+particularly relevant in the context of Neuro-Symbolic frameworks, where the
+final circuit sizes remain manageable and can be encoded efficiently on a GPU.
+This property ensures that the compiled circuits are suitable for integration
+into end-to-end learning pipelines, even when using compilers other than
+\textsc{D4}.
+
+\begin{table}[ht]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \begin{tabular}{llll}
+            \toprule
+            \# Nodes & \textsc{C2D} & \textsc{D4} & \textsc{SharpSAT-TD} \\
+            program &  &  &  \\
+            \midrule
+            1 & 107 & 99 & 160 \\
+            2 & 2555 & 2736 & 1637 \\
+            3 & 170844 & 123025 & 88729 \\
+            4 & 101566925 & 6183424 & 2057170 \\
+            5 & - & - & 21386450 \\
+            6 & - & - & 436225040 \\
+            \bottomrule
+        \end{tabular}
+        \caption*{Circuit Size (Number of Nodes + Edges)}
+        \label{tab:circuit_size}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \begin{tabular}{llll}
+            \toprule
+            \# Nodes & \textsc{C2D} & \textsc{D4} & \textsc{SharpSAT-TD} \\
+            program &  &  &  \\
+            \midrule
+            1 & 0.001 & 0.00014 & 0.001225 \\
+            2 & 0.002 & 0.00105 & 0.003164 \\
+            3 & 0.044 & 0.04816 & 0.016818 \\
+            4 & 37.9 & 3.96765 & 0.264196 \\
+            5 & - & - & 2.93743 \\
+            6 & - & - & 65.4520 \\
+            \bottomrule
+        \end{tabular}
+        \caption*{Compilation Time (Seconds)}
+        \label{tab:compilation_time}
+    \end{minipage}
+    \caption{Comparison of top-down compilers over Listing \ref{lst:ungrounded_pasp_2}.
+    On the left, we have a table comparing circuit size (number of nodes plus edges);
+    on the right, compilation time (in seconds).}
+    \label{tab:comparison}
+\end{table}
+
+On the other hand, the non-stratified results, displayed in Table~\ref{tab:comparison},
+highlight the challenges associated with compiling non-stratified PASP programs, such
+as the one in Listing~\ref{lst:ungrounded_pasp_2}, which is of primary interest to
+our work. Unlike the stratified program in Listing~\ref{lst:ungrounded_pasp_1}, the
+non-stratified program introduces significantly more complex probabilistic-logical
+knowledge and constraints, leading to exponential blow-ups in both circuit size and
+compilation time, even for small instance sizes, which can be easily observed in
+Tables~\ref{tab:circuit_size} and~\ref{tab:compilation_time}.
+
+For instance, while stratified programs remain manageable across all compilers, the
+non-stratified program quickly becomes infeasible for \textsc{C2D} and \textsc{D4} as
+the number of nodes increases. In contrast, \textsc{SharpSAT-TD} demonstrates superior
+scalability, producing smaller circuits and completing compilation in significantly
+less time compared to the other compilers. This makes \textsc{SharpSAT-TD} the most
+promising option for handling the intricate requirements of non-stratified PASP modeling.

@@ -14,19 +14,19 @@ work that combines neural networks with symbolic reasoning in a unified
 architecture.
 
 In our experimental evaluation \ref{subsec:empirical-analysis}, we observed that
-\textsc{SharpSAT-TD} consistently outperformed \textsc{C2D} and \textsc{D4} in
-both compilation time and circuit size, across a range of argumentation
-instances. This finding is aligned with our expectations and previous studies in
-the literature \citep{EITER2024104109, kiesel2023knowledge}. The superior
-performance of \textsc{SharpSAT-TD} can be attributed to its advanced top-down
+\textsc{SharpSAT-TD} outperformed \textsc{C2D} and \textsc{D4} in
+both compilation time and circuit size, when considering non-stratified PASP
+instances, which are the focus of this work. This finding is aligned with our
+expectations and previous studies in the literature \citep{EITER2024104109, kiesel2023knowledge}.
+The superior performance of \textsc{SharpSAT-TD} can be attributed to its advanced top-down
 compilation techniques, where \textsc{C2D} stands as a robust, but older
-alternative, and \textsc{D4} shows competitive performance in certain scenarios
-but generally lags behind the other two compilers.
+alternative, and \textsc{D4} shows very competitive performance in certain scenarios,
+even surpassing \textsc{SharpSAT-TD} in stratified scenarios.
 
 These results highlight the importance of selecting an appropriate knowledge
 compiler for neuro-symbolic applications, specially given an specific domain,
 such is the case of argumentation mining. The efficiency gains achieved by using
-\textsc{SharpSAT-TD} can significantly enhance the practicality of
+Knowledge Compilation can significantly enhance the practicality of
 neuro-symbolic learning loops, enabling larger and more complex argumentation
 graphs to be reasoned about effectively. Future work will focus on exploring
 more classes of argumentations structures, specially those that take advantage

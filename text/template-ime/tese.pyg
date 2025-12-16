@@ -1,0 +1,1 @@
+a :- b1, ..., bM, not c1, ..., not cN
